@@ -48,7 +48,7 @@ export function App(props: AppProps) {
         ) : state.source === 'fixture' ? (
           <p>Demo mode: teams and scores are generated locally and are not real matches.</p>
         ) : null}
-        {updated ? <p>Last update {updated}.</p> : null}
+        {updated ? <p>Last data change {updated}.</p> : null}
       </footer>
 
       <LiveRegion message={live.announcement} />
