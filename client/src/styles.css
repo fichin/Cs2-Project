@@ -24,6 +24,7 @@
   --color-error-bg: #4a1219;
   --color-error-text: #ffe1e4;
   --color-focus: #ffd34d;
+  --color-logo-tile: #e3e8ee;
   --color-skeleton: #222c38;
   --color-skeleton-shine: #2c3846;
 
@@ -75,6 +76,7 @@
     --color-error-bg: #fde7ea;
     --color-error-text: #6b0a17;
     --color-focus: #0a5a99;
+    --color-logo-tile: #eef2f6;
     --color-skeleton: #e3e8ee;
     --color-skeleton-shine: #f1f4f7;
     --shadow-card: 0 1px 3px rgb(15 23 32 / 0.08);
@@ -410,14 +412,18 @@ p {
   color: var(--color-text-muted);
 }
 
+/* Provider logos are designed for light backgrounds (many are black), so images sit on a light tile. */
 .team-logo {
   width: 32px;
   height: 32px;
+  padding: 3px;
   border-radius: var(--radius-sm);
   object-fit: contain;
-  background: var(--color-surface-2);
+  background: var(--color-logo-tile);
 }
 .team-logo--fallback {
+  padding: 0;
+  background: var(--color-surface-2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
