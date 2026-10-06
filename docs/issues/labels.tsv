@@ -1,0 +1,11 @@
+phase-2	1d76db	Phase 2: CS2 Game State Integration & reliability
+phase-3	5319e7	Phase 3: richer views (filters, details, brackets)
+phase-4	0e8a16	Phase 4: deployment, hardening & polish
+bug	d73a4a	Something isn't working
+enhancement	a2eeef	New feature or request
+docs	0075ca	Documentation
+testing	fbca04	Tests and test infrastructure
+a11y	006b75	Accessibility
+performance	e99695	Speed, bundle size, resource usage
+blocked	b60205	Blocked by an external dependency or decision
+good first issue	7057ff	Good for newcomers
