@@ -1,0 +1,13 @@
+01-gsi-receiver.md	GSI receiver: token-protected POST /gsi endpoint with zod validation	phase-2,enhancement
+02-gsi-live-stats.md	Live player stats from GSI over WebSocket + "My match" panel	phase-2,enhancement
+03-gsi-derived-stats.md	Derived stats from the GSI round stream (K/D, KPR, multi-kills, aces, clutches)	phase-2,enhancement,testing
+04-multi-match-filters-details.md	Multi-match view: filters (tournament, status) and match details page	phase-3,enhancement
+05-tournament-bracket.md	Tournament bracket view (free PandaScore data supports it)	phase-3,enhancement
+06-deploy.md	Deploy: server on Render, client on Vercel, origin config and README live demo	phase-4,enhancement,docs
+07-gsi-access-control-rate-limit.md	Optional access control and rate limiting for the GSI endpoint	phase-4,enhancement
+08-dead-websocket-detection.md	Detect silently dead WebSocket connections on the client (heartbeat + watchdog)	phase-2,bug,enhancement,testing
+09-map-round-info.md	Show map/round info when available, hide the fields cleanly otherwise	phase-3,enhancement,blocked
+10-playwright-e2e.md	Playwright e2e tests in CI (demo mode, live update, reconnect banner)	phase-2,testing
+11-bundle-size-lighthouse.md	Reduce client bundle size and add Lighthouse CI	phase-4,performance
+12-axe-a11y-tests.md	Add axe accessibility checks to the test suite	phase-2,a11y,testing
+13-readme-screenshot-gif.md	README: add screenshots and a short demo GIF	phase-4,docs,good first issue
