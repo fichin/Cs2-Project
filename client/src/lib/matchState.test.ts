@@ -79,3 +79,10 @@ describe('describeChanges', () => {
     expect(describeChanges({ a: base }, [{ ...base, tournament: 'renamed' }])).toEqual([]);
   });
 });
+
+describe('snapshot message', () => {
+  it('carries the server status message to clients that connect late', () => {
+    const s = applyServerMessage(initialLiveState, snapshot([], { message: 'showing demo data' }));
+    expect(s.statusMessage).toBe('showing demo data');
+  });
+});

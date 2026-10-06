@@ -83,6 +83,7 @@ describe('Poller', () => {
     expect(store.source).toBe('fixture');
     expect(poller.currentSource.kind).toBe('fixture');
     expect(events.onReset).toHaveBeenCalledTimes(1);
+    expect(store.snapshot().message).toMatch(/token rejected/);
     expect(await poller.pollOnce()).toBe(5_000);
     expect(store.size).toBeGreaterThan(0);
   });

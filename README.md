@@ -57,7 +57,7 @@ live matches first, then upcoming matches, then recent results.
 
 | `type`     | When | Payload |
 | ---------- | ---- | ------- |
-| `snapshot` | Immediately after connecting, and after a source switch | `source`, `stale`, `lastUpdated`, all `matches` |
+| `snapshot` | Immediately after connecting, and after a source switch | `source`, `stale`, `lastUpdated`, `message`, all `matches` |
 | `diff`     | After a poll that changed something | `upserted: Match[]`, `removed: id[]` |
 | `status`   | Freshness or source changed (e.g. upstream down, so `stale: true`) | `source`, `stale`, `lastUpdated`, `message` |
 | `error`    | Server-side problem worth showing | `code`, `message` |

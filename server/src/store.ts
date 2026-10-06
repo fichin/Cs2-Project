@@ -41,6 +41,7 @@ export class MatchStore {
       source: this.source,
       stale: this.stale,
       lastUpdated: this.lastUpdated,
+      message: this.statusMessage,
       serverTime: now.toISOString(),
       matches: [...this.matches.values()],
     };

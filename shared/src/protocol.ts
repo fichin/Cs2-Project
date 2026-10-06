@@ -13,6 +13,8 @@ export const snapshotMessageSchema = z.object({
   source: sourceSchema,
   stale: z.boolean(),
   lastUpdated: z.string().nullable(),
+  /** Human-readable source/freshness note, so late joiners also see it. */
+  message: z.string().nullable(),
   serverTime: z.string(),
   matches: z.array(matchSchema),
 });

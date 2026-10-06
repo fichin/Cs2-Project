@@ -30,6 +30,7 @@ describe('parseServerMessage', () => {
       source: 'fixture',
       stale: false,
       lastUpdated: null,
+      message: null,
       serverTime: '2026-10-06T15:00:00Z',
       matches: [match],
     });

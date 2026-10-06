@@ -32,6 +32,7 @@ export function applyServerMessage(state: LiveState, msg: ServerMessage): LiveSt
         source: msg.source,
         stale: msg.stale,
         lastUpdated: msg.lastUpdated,
+        statusMessage: msg.message,
         serverError: null,
       };
     case 'diff': {
