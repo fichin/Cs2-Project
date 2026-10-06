@@ -1,0 +1,1327 @@
+{
+  "running": [
+    {
+      "slug": "2026-10-06-1bca93bf-64ab-40db-b742-31220f58c3b4",
+      "end_at": null,
+      "results": [
+        {
+          "score": 1,
+          "team_id": 138975
+        },
+        {
+          "score": 0,
+          "team_id": 138974
+        }
+      ],
+      "original_scheduled_at": "2026-10-06T14:00:00Z",
+      "winner": null,
+      "game_advantage": null,
+      "detailed_stats": true,
+      "tournament": {
+        "id": 21997,
+        "name": "Group Stage",
+        "type": "online",
+        "country": null,
+        "begin_at": "2026-09-28T08:00:00Z",
+        "detailed_stats": true,
+        "end_at": "2026-10-07T21:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-cct-europe-series-10-2026-group-stage",
+        "winner_type": "Team",
+        "region": "EEU",
+        "serie_id": 10996,
+        "modified_at": "2026-10-05T15:10:32Z",
+        "league_id": 5232,
+        "prizepool": null,
+        "tier": "c",
+        "has_bracket": false,
+        "live_supported": false
+      },
+      "live": {
+        "supported": false,
+        "url": null,
+        "opens_at": null
+      },
+      "match_type": "best_of",
+      "number_of_games": 3,
+      "league": {
+        "id": 5232,
+        "name": "CCT Europe",
+        "url": null,
+        "slug": "cs-go-cct-europe",
+        "modified_at": "2024-04-13T08:58:18Z",
+        "image_url": "https://cdn-api.pandascore.co/images/league/image/5232/799px-cct_2024_europe_allmode-png"
+      },
+      "rescheduled": false,
+      "begin_at": "2026-10-06T14:07:29Z",
+      "winner_type": "Team",
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "status": "running",
+      "games": [
+        {
+          "complete": true,
+          "id": 232183,
+          "position": 1,
+          "status": "finished",
+          "length": 3420,
+          "finished": true,
+          "begin_at": "2026-10-06T14:07:32Z",
+          "detailed_stats": true,
+          "end_at": "2026-10-06T15:04:32Z",
+          "forfeit": false,
+          "match_id": 1700503,
+          "winner": {
+            "id": 138975,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 232184,
+          "position": 2,
+          "status": "running",
+          "length": null,
+          "finished": false,
+          "begin_at": "2026-10-06T15:17:19Z",
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "match_id": 1700503,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 232185,
+          "position": 3,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "match_id": 1700503,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        }
+      ],
+      "league_id": 5232,
+      "streams_list": [
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.kick.com/cct_cs2",
+          "official": true,
+          "raw_url": "https://kick.com/cct_cs2"
+        },
+        {
+          "main": false,
+          "language": "ru",
+          "embed_url": "https://player.twitch.tv/?channel=betboom_cs_ru4",
+          "official": false,
+          "raw_url": "https://www.twitch.tv/betboom_cs_ru4"
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "forfeit": false,
+      "serie_id": 10996,
+      "tournament_id": 21997,
+      "draw": false,
+      "id": 1700503,
+      "name": "Round 5: BTF vs ex-RUSTEC",
+      "videogame_version": null,
+      "modified_at": "2026-10-06T15:17:19Z",
+      "winner_id": null,
+      "serie": {
+        "id": 10996,
+        "name": "Series #10",
+        "year": 2026,
+        "begin_at": "2026-09-28T08:00:00Z",
+        "end_at": "2026-10-10T19:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-cct-europe-series-10-2026",
+        "winner_type": "Team",
+        "modified_at": "2026-09-21T18:38:02Z",
+        "league_id": 5232,
+        "season": null,
+        "full_name": "Series #10 2026"
+      },
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 138975,
+            "name": "Butterfly",
+            "location": "RU",
+            "slug": "butterfly",
+            "modified_at": "2026-09-27T18:18:09Z",
+            "acronym": "BTF",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/138975/butterfly_ru_allmode.png",
+            "dark_mode_image_url": null
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 138974,
+            "name": "ex-RUSTEC",
+            "location": "RU",
+            "slug": "ex-rustec",
+            "modified_at": "2026-10-04T18:13:46Z",
+            "acronym": null,
+            "image_url": null,
+            "dark_mode_image_url": null
+          }
+        }
+      ],
+      "scheduled_at": "2026-10-06T14:00:00Z"
+    },
+    {
+      "slug": "2026-10-06-d9ba244f-7506-4d56-8449-a83d3b2b5616",
+      "end_at": null,
+      "results": [
+        {
+          "score": 1,
+          "team_id": 126709
+        },
+        {
+          "score": 0,
+          "team_id": 133458
+        }
+      ],
+      "original_scheduled_at": "2026-10-06T12:30:00Z",
+      "winner": null,
+      "game_advantage": null,
+      "detailed_stats": true,
+      "tournament": {
+        "id": 22017,
+        "name": "Group Stage",
+        "type": "offline",
+        "country": "PL",
+        "begin_at": "2026-10-03T09:00:00Z",
+        "detailed_stats": true,
+        "end_at": "2026-10-07T20:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-esl-pro-league-24-2026-group-stage",
+        "winner_type": "Team",
+        "region": "EEU",
+        "serie_id": 11004,
+        "modified_at": "2026-10-01T11:55:05Z",
+        "league_id": 4568,
+        "prizepool": null,
+        "tier": "a",
+        "has_bracket": false,
+        "live_supported": true
+      },
+      "live": {
+        "supported": true,
+        "url": "wss://live.pandascore.co/matches/1711462",
+        "opens_at": "2026-10-06T14:15:00.000000Z"
+      },
+      "match_type": "best_of",
+      "number_of_games": 3,
+      "league": {
+        "id": 4568,
+        "name": "ESL Pro League",
+        "url": "https://pro.eslgaming.com/csgo/proleague/",
+        "slug": "cs-go-esl-pro-league",
+        "modified_at": "2021-08-23T07:15:00Z",
+        "image_url": null
+      },
+      "rescheduled": true,
+      "begin_at": "2026-10-06T14:31:48Z",
+      "winner_type": "Team",
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "status": "running",
+      "games": [
+        {
+          "complete": true,
+          "id": 233167,
+          "position": 1,
+          "status": "finished",
+          "length": 3008,
+          "finished": true,
+          "begin_at": "2026-10-06T14:31:48Z",
+          "detailed_stats": true,
+          "end_at": "2026-10-06T15:21:57Z",
+          "forfeit": false,
+          "match_id": 1711462,
+          "winner": {
+            "id": 126709,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 233168,
+          "position": 2,
+          "status": "running",
+          "length": null,
+          "finished": false,
+          "begin_at": "2026-10-06T15:37:17Z",
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "match_id": 1711462,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 233169,
+          "position": 3,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "match_id": 1711462,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        }
+      ],
+      "league_id": 4568,
+      "streams_list": [
+        {
+          "main": false,
+          "language": "es",
+          "embed_url": "https://player.twitch.tv/?channel=x9nium",
+          "official": false,
+          "raw_url": "https://www.twitch.tv/x9nium"
+        },
+        {
+          "main": false,
+          "language": "ru",
+          "embed_url": "https://player.twitch.tv/?channel=bysl4m",
+          "official": false,
+          "raw_url": "https://www.twitch.tv/bysl4m"
+        },
+        {
+          "main": false,
+          "language": "en",
+          "embed_url": "https://www.youtube.com/embed/7cCU8tarIgk",
+          "official": false,
+          "raw_url": "https://www.youtube.com/watch?v=7cCU8tarIgk"
+        },
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.twitch.tv/?channel=ESLCSb",
+          "official": true,
+          "raw_url": "https://www.twitch.tv/ESLCSb"
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "forfeit": false,
+      "serie_id": 11004,
+      "tournament_id": 22017,
+      "draw": false,
+      "id": 1711462,
+      "name": "Round 4: 9z vs BB",
+      "videogame_version": null,
+      "modified_at": "2026-10-06T15:37:21Z",
+      "winner_id": null,
+      "serie": {
+        "id": 11004,
+        "name": "",
+        "year": 2026,
+        "begin_at": "2026-10-03T08:00:00Z",
+        "end_at": "2026-10-11T21:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-esl-pro-league-24-2026",
+        "winner_type": "Team",
+        "modified_at": "2026-09-21T09:40:39Z",
+        "league_id": 4568,
+        "season": "24",
+        "full_name": "Season 24 2026"
+      },
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 126709,
+            "name": "9z",
+            "location": "AR",
+            "slug": "9z",
+            "modified_at": "2026-09-25T13:30:44Z",
+            "acronym": "9z",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/126709/9z_team_2024_lightmode.png",
+            "dark_mode_image_url": null
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 133458,
+            "name": "BetBoom Team",
+            "location": "RU",
+            "slug": "betboom-team-cs-go",
+            "modified_at": "2026-09-25T13:31:00Z",
+            "acronym": "BB",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/133458/bet_boom_team_2024_allmode.png",
+            "dark_mode_image_url": null
+          }
+        }
+      ],
+      "scheduled_at": "2026-10-06T14:30:00Z"
+    }
+  ],
+  "upcoming": [
+    {
+      "winner_id": null,
+      "end_at": null,
+      "slug": "mellren-2026-10-06",
+      "results": [
+        {
+          "team_id": 138400,
+          "score": 0
+        },
+        {
+          "team_id": 139208,
+          "score": 0
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "match_type": "best_of",
+      "winner_type": "Team",
+      "tournament": {
+        "id": 22102,
+        "name": "Play-In Group B",
+        "type": "online",
+        "country": null,
+        "begin_at": "2026-10-05T08:00:00Z",
+        "detailed_stats": true,
+        "end_at": "2026-10-07T21:00:00Z",
+        "winner_id": null,
+        "winner_type": "Team",
+        "slug": "cs-go-nodwin-clutch-series-13-2026-play-in-group-b",
+        "region": "EEU",
+        "serie_id": 11029,
+        "modified_at": "2026-10-05T19:48:57Z",
+        "league_id": 5437,
+        "has_bracket": true,
+        "prizepool": null,
+        "tier": "d",
+        "live_supported": false
+      },
+      "detailed_stats": true,
+      "draw": false,
+      "serie_id": 11029,
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "games": [
+        {
+          "complete": false,
+          "id": 233795,
+          "position": 1,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1727557,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 233796,
+          "position": 2,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1727557,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 233797,
+          "position": 3,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1727557,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        }
+      ],
+      "streams_list": [
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.kick.com/nodwin_cs2",
+          "official": true,
+          "raw_url": "https://kick.com/nodwin_cs2"
+        }
+      ],
+      "videogame_version": null,
+      "winner": null,
+      "rescheduled": true,
+      "status": "not_started",
+      "forfeit": false,
+      "scheduled_at": "2026-10-06T17:00:00Z",
+      "live": {
+        "supported": false,
+        "url": null,
+        "opens_at": null
+      },
+      "serie": {
+        "id": 11029,
+        "name": "",
+        "year": 2026,
+        "begin_at": "2026-10-05T08:00:00Z",
+        "end_at": "2026-10-27T23:00:00Z",
+        "winner_id": null,
+        "winner_type": "Team",
+        "slug": "cs-go-nodwin-clutch-series-13-2026",
+        "modified_at": "2026-10-04T06:42:25Z",
+        "league_id": 5437,
+        "season": "13",
+        "full_name": "Season 13 2026"
+      },
+      "tournament_id": 22102,
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 138400,
+            "name": "mellren",
+            "location": "BY",
+            "slug": "mellren",
+            "modified_at": "2026-10-06T15:18:43Z",
+            "acronym": null,
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/138400/1m1yb_i8.png",
+            "dark_mode_image_url": null
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 139208,
+            "name": "Gothic",
+            "location": "",
+            "slug": "gothic",
+            "modified_at": "2026-10-05T19:49:51Z",
+            "acronym": null,
+            "image_url": null,
+            "dark_mode_image_url": null
+          }
+        }
+      ],
+      "id": 1727557,
+      "name": "Winners' Match: mellren vs Gothic",
+      "number_of_games": 3,
+      "original_scheduled_at": "2026-10-06T14:00:00Z",
+      "league_id": 5437,
+      "game_advantage": null,
+      "league": {
+        "id": 5437,
+        "name": "NODWIN Clutch Series",
+        "url": null,
+        "slug": "cs-go-nodwin-clutch-series",
+        "modified_at": "2025-09-25T15:53:21Z",
+        "image_url": "https://cdn-api.pandascore.co/images/league/image/5437/nodwin_clutch_series_2_lightmode-png"
+      },
+      "modified_at": "2026-10-06T12:10:36Z",
+      "begin_at": "2026-10-06T17:00:00Z"
+    },
+    {
+      "winner_id": null,
+      "end_at": null,
+      "slug": "2026-10-06-06a1357f-47cb-4d77-bb78-f8b63644c237",
+      "results": [
+        {
+          "team_id": 130564,
+          "score": 0
+        },
+        {
+          "team_id": 3216,
+          "score": 0
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "match_type": "best_of",
+      "winner_type": "Team",
+      "tournament": {
+        "id": 22017,
+        "name": "Group Stage",
+        "type": "offline",
+        "country": "PL",
+        "begin_at": "2026-10-03T09:00:00Z",
+        "detailed_stats": true,
+        "end_at": "2026-10-07T20:00:00Z",
+        "winner_id": null,
+        "winner_type": "Team",
+        "slug": "cs-go-esl-pro-league-24-2026-group-stage",
+        "region": "EEU",
+        "serie_id": 11004,
+        "modified_at": "2026-10-01T11:55:05Z",
+        "league_id": 4568,
+        "has_bracket": false,
+        "prizepool": null,
+        "tier": "a",
+        "live_supported": true
+      },
+      "detailed_stats": true,
+      "draw": false,
+      "serie_id": 11004,
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "games": [
+        {
+          "complete": false,
+          "id": 233173,
+          "position": 1,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1711470,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 233174,
+          "position": 2,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1711470,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 233175,
+          "position": 3,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1711470,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": true,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        }
+      ],
+      "streams_list": [
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.twitch.tv/?channel=ESLCS",
+          "official": true,
+          "raw_url": "https://www.twitch.tv/ESLCS"
+        }
+      ],
+      "videogame_version": null,
+      "winner": null,
+      "rescheduled": false,
+      "status": "not_started",
+      "forfeit": false,
+      "scheduled_at": "2026-10-06T17:00:00Z",
+      "live": {
+        "supported": true,
+        "url": "wss://live.pandascore.co/matches/1711470",
+        "opens_at": "2026-10-06T16:45:00.000000Z"
+      },
+      "serie": {
+        "id": 11004,
+        "name": "",
+        "year": 2026,
+        "begin_at": "2026-10-03T08:00:00Z",
+        "end_at": "2026-10-11T21:00:00Z",
+        "winner_id": null,
+        "winner_type": "Team",
+        "slug": "cs-go-esl-pro-league-24-2026",
+        "modified_at": "2026-09-21T09:40:39Z",
+        "league_id": 4568,
+        "season": "24",
+        "full_name": "Season 24 2026"
+      },
+      "tournament_id": 22017,
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 130564,
+            "name": "Team Falcons",
+            "location": "SA",
+            "slug": "falcons-esports",
+            "modified_at": "2026-09-25T13:30:52Z",
+            "acronym": "FAL",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/130564/team_falconslogo_square.png",
+            "dark_mode_image_url": null
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 3216,
+            "name": "Natus Vincere",
+            "location": "UA",
+            "slug": "natus-vincere-cs-go",
+            "modified_at": "2026-09-25T13:30:23Z",
+            "acronym": "NAVI",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/3216/1022px_natus_vincere_2021_lightmode.png",
+            "dark_mode_image_url": null
+          }
+        }
+      ],
+      "id": 1711470,
+      "name": "Round 4: FAL vs NAVI",
+      "number_of_games": 3,
+      "original_scheduled_at": "2026-10-06T17:00:00Z",
+      "league_id": 4568,
+      "game_advantage": null,
+      "league": {
+        "id": 4568,
+        "name": "ESL Pro League",
+        "url": "https://pro.eslgaming.com/csgo/proleague/",
+        "slug": "cs-go-esl-pro-league",
+        "modified_at": "2021-08-23T07:15:00Z",
+        "image_url": null
+      },
+      "modified_at": "2026-10-06T12:43:32Z",
+      "begin_at": "2026-10-06T17:00:00Z"
+    }
+  ],
+  "past": [
+    {
+      "slug": "lph-gaming-2026-10-06",
+      "end_at": "2026-10-06T15:41:23Z",
+      "results": [
+        {
+          "score": 2,
+          "team_id": 136786
+        },
+        {
+          "score": 0,
+          "team_id": 129160
+        }
+      ],
+      "original_scheduled_at": "2026-10-06T17:00:00Z",
+      "winner": {
+        "id": 136786,
+        "name": "LPH Gaming",
+        "location": "CZ",
+        "slug": "lph-gaming",
+        "modified_at": "2026-10-06T10:21:53Z",
+        "acronym": "LPH",
+        "image_url": "https://cdn-api.pandascore.co/images/team/image/136786/171px_lph_gaming_allmode.png",
+        "dark_mode_image_url": null
+      },
+      "game_advantage": null,
+      "detailed_stats": true,
+      "tournament": {
+        "id": 22102,
+        "name": "Play-In Group B",
+        "type": "online",
+        "country": null,
+        "begin_at": "2026-10-05T08:00:00Z",
+        "detailed_stats": true,
+        "end_at": "2026-10-07T21:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-nodwin-clutch-series-13-2026-play-in-group-b",
+        "winner_type": "Team",
+        "region": "EEU",
+        "serie_id": 11029,
+        "modified_at": "2026-10-05T19:48:57Z",
+        "league_id": 5437,
+        "prizepool": null,
+        "tier": "d",
+        "has_bracket": true,
+        "live_supported": false
+      },
+      "live": {
+        "supported": false,
+        "url": null,
+        "opens_at": null
+      },
+      "match_type": "best_of",
+      "number_of_games": 3,
+      "league": {
+        "id": 5437,
+        "name": "NODWIN Clutch Series",
+        "url": null,
+        "slug": "cs-go-nodwin-clutch-series",
+        "modified_at": "2025-09-25T15:53:21Z",
+        "image_url": "https://cdn-api.pandascore.co/images/league/image/5437/nodwin_clutch_series_2_lightmode-png"
+      },
+      "rescheduled": true,
+      "begin_at": "2026-10-06T14:10:21Z",
+      "winner_type": "Team",
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "status": "finished",
+      "games": [
+        {
+          "complete": true,
+          "id": 233798,
+          "position": 1,
+          "status": "finished",
+          "length": 2702,
+          "finished": true,
+          "begin_at": "2026-10-06T14:10:21Z",
+          "detailed_stats": true,
+          "end_at": "2026-10-06T14:55:24Z",
+          "forfeit": false,
+          "match_id": 1727558,
+          "winner": {
+            "id": 136786,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        },
+        {
+          "complete": true,
+          "id": 233799,
+          "position": 2,
+          "status": "finished",
+          "length": 1701,
+          "finished": true,
+          "begin_at": "2026-10-06T15:13:02Z",
+          "detailed_stats": true,
+          "end_at": "2026-10-06T15:41:24Z",
+          "forfeit": false,
+          "match_id": 1727558,
+          "winner": {
+            "id": 136786,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        }
+      ],
+      "league_id": 5437,
+      "streams_list": [
+        {
+          "main": false,
+          "language": "ru",
+          "embed_url": "https://player.twitch.tv/?channel=floppyacs",
+          "official": false,
+          "raw_url": "https://www.twitch.tv/floppyacs"
+        },
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.kick.com/nodwin_cs2",
+          "official": true,
+          "raw_url": "https://kick.com/nodwin_cs2"
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "forfeit": false,
+      "serie_id": 11029,
+      "tournament_id": 22102,
+      "draw": false,
+      "id": 1727558,
+      "name": "Elimination Match: LPH vs MOUZ.N",
+      "videogame_version": null,
+      "modified_at": "2026-10-06T15:55:02Z",
+      "winner_id": 136786,
+      "serie": {
+        "id": 11029,
+        "name": "",
+        "year": 2026,
+        "begin_at": "2026-10-05T08:00:00Z",
+        "end_at": "2026-10-27T23:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-nodwin-clutch-series-13-2026",
+        "winner_type": "Team",
+        "modified_at": "2026-10-04T06:42:25Z",
+        "league_id": 5437,
+        "season": "13",
+        "full_name": "Season 13 2026"
+      },
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 136786,
+            "name": "LPH Gaming",
+            "location": "CZ",
+            "slug": "lph-gaming",
+            "modified_at": "2026-10-06T10:21:53Z",
+            "acronym": "LPH",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/136786/171px_lph_gaming_allmode.png",
+            "dark_mode_image_url": null
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 129160,
+            "name": "MOUZ NXT",
+            "location": "DE",
+            "slug": "mouz-nxt",
+            "modified_at": "2026-10-04T17:54:09Z",
+            "acronym": "MOUZ.N",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/129160/mou_zlogo_square.png",
+            "dark_mode_image_url": null
+          }
+        }
+      ],
+      "scheduled_at": "2026-10-06T14:10:00Z"
+    },
+    {
+      "slug": "eac-extra-vs-thechampiongg-2026-10-06",
+      "end_at": "2026-10-06T15:00:52Z",
+      "results": [
+        {
+          "score": 2,
+          "team_id": 139089
+        },
+        {
+          "score": 0,
+          "team_id": 139314
+        }
+      ],
+      "original_scheduled_at": "2026-10-06T08:00:00Z",
+      "winner": {
+        "id": 139089,
+        "name": "EAC Extra",
+        "location": "DK",
+        "slug": "eac-extra",
+        "modified_at": "2026-10-06T11:21:06Z",
+        "acronym": "EACE",
+        "image_url": "https://cdn-api.pandascore.co/images/team/image/139089/473px_esport_academy_copenhagen_extra_allmode.png",
+        "dark_mode_image_url": "https://cdn-api.pandascore.co/dark_images/team/dark_image/139089/473px_esport_academy_copenhagen_extra_allmode.png"
+      },
+      "game_advantage": null,
+      "detailed_stats": false,
+      "tournament": {
+        "id": 22113,
+        "name": "Group D",
+        "type": "online",
+        "country": null,
+        "begin_at": "2026-10-06T08:00:00Z",
+        "detailed_stats": false,
+        "end_at": "2026-10-11T14:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-european-pro-league-regular-7-2026-group-d",
+        "winner_type": "Team",
+        "region": "EEU",
+        "serie_id": 11032,
+        "modified_at": "2026-10-06T11:21:07Z",
+        "league_id": 4854,
+        "prizepool": null,
+        "tier": "d",
+        "has_bracket": true,
+        "live_supported": false
+      },
+      "live": {
+        "supported": false,
+        "url": null,
+        "opens_at": null
+      },
+      "match_type": "best_of",
+      "number_of_games": 3,
+      "league": {
+        "id": 4854,
+        "name": "European Pro League",
+        "url": null,
+        "slug": "cs-go-european-pro-league",
+        "modified_at": "2023-12-22T16:34:11Z",
+        "image_url": "https://cdn-api.pandascore.co/images/league/image/4854/799px-european_pro_league_2023_lightmode-png"
+      },
+      "rescheduled": true,
+      "begin_at": "2026-10-06T13:15:35Z",
+      "winner_type": "Team",
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "status": "finished",
+      "games": [
+        {
+          "complete": true,
+          "id": 234059,
+          "position": 1,
+          "status": "finished",
+          "length": 2130,
+          "finished": true,
+          "begin_at": "2026-10-06T13:15:36Z",
+          "detailed_stats": false,
+          "end_at": "2026-10-06T13:51:06Z",
+          "forfeit": false,
+          "match_id": 1728298,
+          "winner": {
+            "id": 139089,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        },
+        {
+          "complete": true,
+          "id": 234060,
+          "position": 2,
+          "status": "finished",
+          "length": 2999,
+          "finished": true,
+          "begin_at": "2026-10-06T14:10:53Z",
+          "detailed_stats": false,
+          "end_at": "2026-10-06T15:00:53Z",
+          "forfeit": false,
+          "match_id": 1728298,
+          "winner": {
+            "id": 139089,
+            "type": "Team"
+          },
+          "winner_type": "Team"
+        }
+      ],
+      "league_id": 4854,
+      "streams_list": [
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.kick.com/eplcs_en",
+          "official": true,
+          "raw_url": "https://kick.com/eplcs_en"
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "forfeit": false,
+      "serie_id": 11032,
+      "tournament_id": 22113,
+      "draw": false,
+      "id": 1728298,
+      "name": "EACE vs TheChampionGG",
+      "videogame_version": null,
+      "modified_at": "2026-10-06T15:00:54Z",
+      "winner_id": 139089,
+      "serie": {
+        "id": 11032,
+        "name": "Regular",
+        "year": 2026,
+        "begin_at": "2026-10-03T08:00:00Z",
+        "end_at": "2026-10-20T21:00:00Z",
+        "winner_id": null,
+        "slug": "cs-go-european-pro-league-regular-7-2026",
+        "winner_type": "Team",
+        "modified_at": "2026-10-04T10:12:52Z",
+        "league_id": 4854,
+        "season": "7",
+        "full_name": "Regular season 7 2026"
+      },
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 139089,
+            "name": "EAC Extra",
+            "location": "DK",
+            "slug": "eac-extra",
+            "modified_at": "2026-10-06T11:21:06Z",
+            "acronym": "EACE",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/139089/473px_esport_academy_copenhagen_extra_allmode.png",
+            "dark_mode_image_url": "https://cdn-api.pandascore.co/dark_images/team/dark_image/139089/473px_esport_academy_copenhagen_extra_allmode.png"
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 139314,
+            "name": "TheChampionGG",
+            "location": "UA",
+            "slug": "thechampiongg",
+            "modified_at": "2026-10-06T11:21:07Z",
+            "acronym": null,
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/139314/488px_the_champion_gg_allmode.png",
+            "dark_mode_image_url": "https://cdn-api.pandascore.co/dark_images/team/dark_image/139314/488px_the_champion_gg_allmode.png"
+          }
+        }
+      ],
+      "scheduled_at": "2026-10-06T13:10:00Z"
+    },
+    {
+      "winner_id": null,
+      "end_at": null,
+      "slug": "vitality-academy-vs-genone-2026-10-05",
+      "results": [
+        {
+          "team_id": 138618,
+          "score": 0
+        },
+        {
+          "team_id": 128519,
+          "score": 0
+        }
+      ],
+      "videogame_title": {
+        "id": 13,
+        "name": "Counter-Strike 2",
+        "slug": "cs-2",
+        "videogame_id": 3
+      },
+      "match_type": "best_of",
+      "winner_type": "Team",
+      "tournament": {
+        "id": 22112,
+        "name": "Group C",
+        "type": "online",
+        "country": null,
+        "begin_at": "2026-10-05T08:00:00Z",
+        "detailed_stats": false,
+        "end_at": "2026-10-11T12:00:00Z",
+        "winner_id": null,
+        "winner_type": "Team",
+        "slug": "cs-go-european-pro-league-regular-7-2026-group-c",
+        "region": "EEU",
+        "serie_id": 11032,
+        "modified_at": "2026-10-06T12:59:00Z",
+        "league_id": 4854,
+        "has_bracket": true,
+        "prizepool": null,
+        "tier": "d",
+        "live_supported": false
+      },
+      "detailed_stats": false,
+      "draw": false,
+      "serie_id": 11032,
+      "videogame": {
+        "id": 3,
+        "name": "Counter-Strike",
+        "slug": "cs-go"
+      },
+      "games": [
+        {
+          "complete": false,
+          "id": 234047,
+          "position": 1,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1728294,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": false,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 234048,
+          "position": 2,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1728294,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": false,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        },
+        {
+          "complete": false,
+          "id": 234049,
+          "position": 3,
+          "status": "not_started",
+          "length": null,
+          "finished": false,
+          "match_id": 1728294,
+          "winner": {
+            "id": null,
+            "type": "Team"
+          },
+          "begin_at": null,
+          "detailed_stats": false,
+          "end_at": null,
+          "forfeit": false,
+          "winner_type": "Team"
+        }
+      ],
+      "streams_list": [
+        {
+          "main": true,
+          "language": "en",
+          "embed_url": "https://player.kick.com/eplcs_en",
+          "official": true,
+          "raw_url": "https://kick.com/eplcs_en"
+        }
+      ],
+      "videogame_version": null,
+      "winner": null,
+      "rescheduled": false,
+      "status": "canceled",
+      "forfeit": false,
+      "scheduled_at": "2026-10-05T10:30:00Z",
+      "live": {
+        "supported": false,
+        "url": null,
+        "opens_at": null
+      },
+      "serie": {
+        "id": 11032,
+        "name": "Regular",
+        "year": 2026,
+        "begin_at": "2026-10-03T08:00:00Z",
+        "end_at": "2026-10-20T21:00:00Z",
+        "winner_id": null,
+        "winner_type": "Team",
+        "slug": "cs-go-european-pro-league-regular-7-2026",
+        "modified_at": "2026-10-04T10:12:52Z",
+        "league_id": 4854,
+        "season": "7",
+        "full_name": "Regular season 7 2026"
+      },
+      "tournament_id": 22112,
+      "opponents": [
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 138618,
+            "name": "Vitality Academy",
+            "location": "",
+            "slug": "vitality-academy",
+            "modified_at": "2026-10-06T10:21:51Z",
+            "acronym": "VIT.A",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/138618/638px_vitality_academy_lightmode.png",
+            "dark_mode_image_url": "https://cdn-api.pandascore.co/dark_images/team/dark_image/138618/638px_vitality_academy_darkmode.png"
+          }
+        },
+        {
+          "type": "Team",
+          "opponent": {
+            "id": 128519,
+            "name": "GenOne",
+            "location": "FR",
+            "slug": "genone",
+            "modified_at": "2026-10-04T21:35:19Z",
+            "acronym": "G1",
+            "image_url": "https://cdn-api.pandascore.co/images/team/image/128519/genone_csgo.png",
+            "dark_mode_image_url": "https://cdn-api.pandascore.co/dark_images/team/dark_image/128519/123px_gen_one_darkmode.png"
+          }
+        }
+      ],
+      "id": 1728294,
+      "name": "VIT.A vs G1",
+      "number_of_games": 3,
+      "original_scheduled_at": "2026-10-05T10:30:00Z",
+      "league_id": 4854,
+      "game_advantage": null,
+      "league": {
+        "id": 4854,
+        "name": "European Pro League",
+        "url": null,
+        "slug": "cs-go-european-pro-league",
+        "modified_at": "2023-12-22T16:34:11Z",
+        "image_url": "https://cdn-api.pandascore.co/images/league/image/4854/799px-european_pro_league_2023_lightmode-png"
+      },
+      "modified_at": "2026-10-06T02:19:22Z",
+      "begin_at": null
+    }
+  ]
+}
