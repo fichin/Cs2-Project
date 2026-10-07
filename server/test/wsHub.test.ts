@@ -26,7 +26,8 @@ beforeEach(async () => {
     allowedOrigins: [ORIGIN],
     maxConnectionsPerIp: 2,
     maxPayloadBytes: 64,
-    heartbeatMs: 50,
+    pingIntervalMs: 50,
+    heartbeatMs: 60_000, // long enough that heartbeats never interleave with these tests' messages
     getSnapshot: () => store.snapshot(),
     logger: silentLogger,
   });
@@ -133,5 +134,80 @@ describe('WebSocket hub', () => {
     const code = new Promise<number>((r) => c.ws.on('close', (cc) => r(cc)));
     await hub.close();
     expect(await code).toBe(1001);
+  });
+
+  it('adds heartbeatMs to broadcast snapshots too (e.g. after a source switch)', async () => {
+    const c = connect();
+    await c.next(1);
+    hub.broadcast(store.snapshot());
+    expect(await c.next(2)).toMatchObject({ type: 'snapshot', heartbeatMs: 60_000 });
+    c.ws.close();
+  });
+});
+
+describe('WebSocket hub heartbeat', () => {
+  const HEARTBEAT_MS = 40;
+
+  /** A separate hub with a short heartbeat, so the main suite's message order stays predictable. */
+  async function startHeartbeatHub() {
+    const hbServer = createServer();
+    const hbHub = attachWsHub(hbServer, {
+      path: '/ws',
+      allowedOrigins: [ORIGIN],
+      maxConnectionsPerIp: 2,
+      heartbeatMs: HEARTBEAT_MS,
+      getSnapshot: () => store.snapshot(),
+      logger: silentLogger,
+    });
+    await new Promise<void>((r) => hbServer.listen(0, '127.0.0.1', r));
+    const { port } = hbServer.address() as AddressInfo;
+    const stop = async () => {
+      await hbHub.close();
+      await new Promise<void>((r) => hbServer.close(() => r()));
+    };
+    return { hub: hbHub, url: `ws://127.0.0.1:${port}/ws`, stop };
+  }
+
+  it("a new client's first message is a snapshot announcing the configured heartbeatMs", async () => {
+    const hb = await startHeartbeatHub();
+    try {
+      const c = connect(ORIGIN, hb.url);
+      expect(await c.next(1)).toMatchObject({ type: 'snapshot', heartbeatMs: HEARTBEAT_MS });
+      c.ws.close();
+    } finally {
+      await hb.stop();
+    }
+  });
+
+  it('sends a heartbeat message after HEARTBEAT_MS', async () => {
+    const hb = await startHeartbeatHub();
+    try {
+      const c = connect(ORIGIN, hb.url);
+      await c.next(1);
+      const started = Date.now();
+      const msg = await c.next(2);
+      expect(msg).toMatchObject({ type: 'heartbeat', v: 1 });
+      expect(msg.type === 'heartbeat' && Number.isNaN(Date.parse(msg.serverTime))).toBe(false);
+      expect(Date.now() - started).toBeLessThan(HEARTBEAT_MS * 10);
+      c.ws.close();
+    } finally {
+      await hb.stop();
+    }
+  });
+
+  it('clears the heartbeat interval on close, so it cannot leak into other tests', async () => {
+    const setSpy = vi.spyOn(globalThis, 'setInterval');
+    const clearSpy = vi.spyOn(globalThis, 'clearInterval');
+    try {
+      const hb = await startHeartbeatHub();
+      const timers = setSpy.mock.results.map((r) => r.value);
+      expect(timers).toHaveLength(2); // ping + heartbeat
+      await hb.stop();
+      const cleared = clearSpy.mock.calls.map(([t]) => t);
+      for (const t of timers) expect(cleared).toContain(t);
+    } finally {
+      setSpy.mockRestore();
+      clearSpy.mockRestore();
+    }
   });
 });

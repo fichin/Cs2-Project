@@ -1,6 +1,6 @@
 import type { IncomingMessage, Server } from 'node:http';
 import type { Duplex } from 'node:stream';
-import { type ServerMessage, serializeServerMessage } from '@esports-live/shared';
+import { PROTOCOL_VERSION, type ServerMessage, serializeServerMessage } from '@esports-live/shared';
 import { WebSocket, WebSocketServer } from 'ws';
 import type { Logger } from './logger.js';
 
@@ -10,6 +10,9 @@ export interface WsHubOptions {
   maxConnectionsPerIp: number;
   /** Clients only ever need to answer pings; anything bigger is rejected by `ws` (close 1009). */
   maxPayloadBytes?: number;
+  /** Protocol-level ping/pong used to terminate dead clients (invisible to browser JS). */
+  pingIntervalMs?: number;
+  /** Interval of the application-level `heartbeat` message; also announced in every snapshot. */
   heartbeatMs?: number;
   /** Drop clients whose send buffer grows past this (they can't keep up). */
   maxBufferedBytes?: number;
@@ -47,7 +50,8 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
   const {
     logger,
     maxPayloadBytes = 1024,
-    heartbeatMs = 30_000,
+    pingIntervalMs = 30_000,
+    heartbeatMs = 20_000,
     maxBufferedBytes = 1024 * 1024,
     trustProxy = false,
   } = opts;
@@ -63,6 +67,10 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
     }
     ws.send(frame);
   };
+
+  /** Tell clients the heartbeat interval so they can size their watchdog. */
+  const withHeartbeat = (message: ServerMessage): ServerMessage =>
+    message.type === 'snapshot' ? { ...message, heartbeatMs } : message;
 
   const onUpgrade = (req: IncomingMessage, socket: Duplex, head: Buffer) => {
     const { pathname } = new URL(req.url ?? '/', 'http://localhost');
@@ -102,11 +110,17 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
       else perIp.set(ip, left);
     });
 
-    send(ws, serializeServerMessage(opts.getSnapshot()));
+    send(ws, serializeServerMessage(withHeartbeat(opts.getSnapshot())));
   });
 
-  // Heartbeat: a client that didn't answer the previous ping is considered dead.
-  const heartbeat = setInterval(() => {
+  const broadcast = (message: ServerMessage) => {
+    if (wss.clients.size === 0) return;
+    const frame = serializeServerMessage(withHeartbeat(message)); // serialize once for all clients
+    for (const client of wss.clients) send(client, frame);
+  };
+
+  // Ping: a client that didn't answer the previous ping is considered dead.
+  const pingTimer = setInterval(() => {
     for (const client of wss.clients as Set<TrackedSocket>) {
       if (client.isAlive === false) {
         client.terminate();
@@ -115,19 +129,22 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
       client.isAlive = false;
       client.ping();
     }
+  }, pingIntervalMs);
+  pingTimer.unref();
+
+  // Heartbeat: browsers can't see pings, so send a tiny message clients can use to detect silent drops.
+  const heartbeatTimer = setInterval(() => {
+    broadcast({ type: 'heartbeat', v: PROTOCOL_VERSION, serverTime: new Date().toISOString() });
   }, heartbeatMs);
-  heartbeat.unref();
+  heartbeatTimer.unref();
 
   return {
-    broadcast(message) {
-      if (wss.clients.size === 0) return;
-      const frame = serializeServerMessage(message); // serialize once for all clients
-      for (const client of wss.clients) send(client, frame);
-    },
+    broadcast,
     clientCount: () => wss.clients.size,
     close: () =>
       new Promise<void>((resolve) => {
-        clearInterval(heartbeat);
+        clearInterval(pingTimer);
+        clearInterval(heartbeatTimer);
         server.off('upgrade', onUpgrade);
         for (const client of wss.clients) client.close(1001, 'Server shutting down');
         // Give clients a moment to receive the close frame, then force it.

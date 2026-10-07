@@ -21,7 +21,7 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-const config = parseConfig(process.env);
+const config = parseConfig(process.env, (message) => logger.warn(message));
 const selection = selectSource(config, logger);
 const label = selection.source.kind === 'pandascore' ? 'PandaScore (live data)' : 'fixtures (DEMO data)';
 logger.info(`Data source: ${label} — ${selection.reason}; polling every ${selection.intervalMs / 1000}s`);
@@ -33,6 +33,7 @@ const hub = attachWsHub(server, {
   allowedOrigins: config.ALLOWED_ORIGIN,
   maxConnectionsPerIp: config.MAX_CONNECTIONS_PER_IP,
   trustProxy: config.TRUST_PROXY,
+  heartbeatMs: config.HEARTBEAT_MS,
   getSnapshot: () => store.snapshot(),
   logger,
 });

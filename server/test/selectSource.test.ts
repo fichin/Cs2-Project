@@ -39,6 +39,19 @@ describe('parseConfig', () => {
     expect(c.ALLOWED_ORIGIN).toEqual(['http://localhost:5173']);
   });
 
+  it('clamps HEARTBEAT_MS into 5000-60000 and warns, without crashing', () => {
+    const warnings: string[] = [];
+    const warn = (m: string) => warnings.push(m);
+    expect(parseConfig({}, warn).HEARTBEAT_MS).toBe(20_000);
+    expect(parseConfig({ HEARTBEAT_MS: '30000' }, warn).HEARTBEAT_MS).toBe(30_000);
+    expect(warnings).toEqual([]);
+
+    expect(parseConfig({ HEARTBEAT_MS: '1000' }, warn).HEARTBEAT_MS).toBe(5_000);
+    expect(parseConfig({ HEARTBEAT_MS: '999999' }, warn).HEARTBEAT_MS).toBe(60_000);
+    expect(warnings).toHaveLength(2);
+    expect(warnings[0]).toMatch(/HEARTBEAT_MS=1000 .*using 5000/);
+  });
+
   it('accepts a comma-separated origin list', () => {
     expect(parseConfig({ ALLOWED_ORIGIN: 'https://a.dev/, http://b.dev' }).ALLOWED_ORIGIN).toEqual([
       'https://a.dev',
