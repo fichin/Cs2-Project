@@ -55,7 +55,12 @@ fi
 
 # Rename the built-in Status options to Backlog / In progress / In review / Done.
 field_id="$(gh project field-list "$number" --owner "$OWNER" --format json --jq '.fields[] | select(.name == "Status") | .id')"
-if gh api graphql -f fieldId="$field_id" -f query='
+current="$(gh project field-list "$number" --owner "$OWNER" --format json \
+  --jq '.fields[] | select(.name == "Status") | [.options[]?.name] | join("|")')"
+# Replacing options resets every card's Status, so only do it when the columns differ.
+if [ "$current" = "Backlog|In progress|In review|Done" ]; then
+  echo "  Status columns already set: Backlog, In progress, In review, Done"
+elif gh api graphql -f fieldId="$field_id" -f query='
   mutation($fieldId: ID!) {
     updateProjectV2Field(input: {
       fieldId: $fieldId,
@@ -72,9 +77,24 @@ else
   echo "  could not update Status options via API; rename them in the project settings UI"
 fi
 
+project_id="$(gh project view "$number" --owner "$OWNER" --format json --jq '.id')"
+backlog_id="$(gh project field-list "$number" --owner "$OWNER" --format json \
+  --jq '.fields[] | select(.name == "Status") | .options[]? | select(.name == "Backlog") | .id')"
+
 for url in "${urls[@]}"; do
   gh project item-add "$number" --owner "$OWNER" --url "$url" >/dev/null && echo "  added $url"
 done
+
+# New items have no Status; put them in Backlog so they show up in a board column.
+if [ -n "$backlog_id" ]; then
+  gh project item-list "$number" --owner "$OWNER" --limit 500 --format json \
+    --jq '.items[] | select(.status == null or .status == "") | .id' |
+  while read -r item; do
+    gh project item-edit --id "$item" --project-id "$project_id" --field-id "$field_id" \
+      --single-select-option-id "$backlog_id" >/dev/null
+  done
+  echo "  items without a Status moved to Backlog"
+fi
 
 echo "Done. Open the project, add a Board layout grouped by Status if it shows as a table:"
 gh project view "$number" --owner "$OWNER" --format json --jq '.url'
