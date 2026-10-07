@@ -53,6 +53,8 @@ export function applyServerMessage(state: LiveState, msg: ServerMessage): LiveSt
       };
     case 'error':
       return { ...state, serverError: msg.message };
+    case 'heartbeat':
+      return state;
   }
 }
 
@@ -68,7 +70,8 @@ export interface GroupedMatches {
 export function groupMatches(matches: Iterable<Match>): GroupedMatches {
   const all = [...matches];
   const by = (status: Match['status']) => all.filter((m) => m.status === status);
-  const asc = (key: (m: Match) => number) => (a: Match, b: Match) => (key(a) || Infinity) - (key(b) || Infinity);
+  const asc = (key: (m: Match) => number) => (a: Match, b: Match) =>
+    (key(a) || Infinity) - (key(b) || Infinity);
   return {
     running: by('running').sort(asc((m) => time(m.beginAt ?? m.scheduledAt))),
     upcoming: by('upcoming').sort(asc((m) => time(m.scheduledAt))),
@@ -94,7 +97,10 @@ export function describeChanges(prev: Record<string, Match>, upserted: readonly 
       out.push(winner ? `${winner} won: ${a} ${score} ${b}` : `Match finished: ${a} ${score} ${b}`);
     } else if (before.status === 'upcoming' && next.status === 'running') {
       out.push(`Now live: ${a} versus ${b}`);
-    } else if (before.teams[0].score !== next.teams[0].score || before.teams[1].score !== next.teams[1].score) {
+    } else if (
+      before.teams[0].score !== next.teams[0].score ||
+      before.teams[1].score !== next.teams[1].score
+    ) {
       out.push(`Score update: ${a} ${score} ${b}`);
     }
   }

@@ -7,7 +7,13 @@ const match: Match = {
   status: 'running',
   teams: [
     { id: 'a', name: 'Alpha', acronym: 'ALP', logoUrl: null, score: 1 },
-    { id: 'b', name: 'Bravo', acronym: null, logoUrl: 'https://example.com/b.png', score: 0 },
+    {
+      id: 'b',
+      name: 'Bravo',
+      acronym: null,
+      logoUrl: 'https://example.com/b.png',
+      score: 0,
+    },
   ],
   gameNumber: 2,
   mapName: 'Mirage',
@@ -39,32 +45,92 @@ describe('parseServerMessage', () => {
     if (result.ok) expect(result.message.type).toBe('snapshot');
   });
 
-  it('accepts diff, status and error messages', () => {
+  it('accepts diff, status, error and heartbeat messages', () => {
     const msgs = [
-      { type: 'diff', v: 1, serverTime: 'x', upserted: [match], removed: ['fx-9'] },
-      { type: 'status', v: 1, source: 'pandascore', stale: true, lastUpdated: null, message: 'upstream down' },
+      {
+        type: 'diff',
+        v: 1,
+        serverTime: 'x',
+        upserted: [match],
+        removed: ['fx-9'],
+      },
+      {
+        type: 'status',
+        v: 1,
+        source: 'pandascore',
+        stale: true,
+        lastUpdated: null,
+        message: 'upstream down',
+      },
       { type: 'error', v: 1, code: 'RATE_LIMITED', message: 'slow down' },
+      { type: 'heartbeat', v: 1, serverTime: 'x' },
     ];
     for (const m of msgs) expect(parseServerMessage(m).ok).toBe(true);
   });
 
   it('rejects invalid JSON, unknown types, wrong versions and bad shapes', () => {
-    expect(parseServerMessage('{not json')).toEqual({ ok: false, error: 'invalid JSON' });
+    expect(parseServerMessage('{not json')).toEqual({
+      ok: false,
+      error: 'invalid JSON',
+    });
     expect(parseServerMessage({ type: 'hello', v: 1 }).ok).toBe(false);
-    expect(parseServerMessage({ type: 'diff', v: 2, serverTime: 'x', upserted: [], removed: [] }).ok).toBe(false);
     expect(
-      parseServerMessage({ type: 'diff', v: 1, serverTime: 'x', upserted: [{ ...match, teams: [] }], removed: [] }).ok,
+      parseServerMessage({
+        type: 'diff',
+        v: 2,
+        serverTime: 'x',
+        upserted: [],
+        removed: [],
+      }).ok,
     ).toBe(false);
     expect(
-      parseServerMessage({ type: 'diff', v: 1, serverTime: 'x', upserted: [{ ...match, status: 'paused' }], removed: [] })
-        .ok,
+      parseServerMessage({
+        type: 'diff',
+        v: 1,
+        serverTime: 'x',
+        upserted: [{ ...match, teams: [] }],
+        removed: [],
+      }).ok,
+    ).toBe(false);
+    expect(
+      parseServerMessage({
+        type: 'diff',
+        v: 1,
+        serverTime: 'x',
+        upserted: [{ ...match, status: 'paused' }],
+        removed: [],
+      }).ok,
     ).toBe(false);
     expect(parseServerMessage(null).ok).toBe(false);
   });
 
   it('serializeServerMessage round-trips and refuses malformed messages', () => {
     const msg = { type: 'error', v: 1, code: 'X', message: 'y' } as const;
-    expect(parseServerMessage(serializeServerMessage(msg))).toEqual({ ok: true, message: msg });
+    expect(parseServerMessage(serializeServerMessage(msg))).toEqual({
+      ok: true,
+      message: msg,
+    });
     expect(() => serializeServerMessage({ type: 'error', v: 1, code: 1 } as never)).toThrow();
+  });
+
+  it('rejects a heartbeat with a missing or invalid field', () => {
+    expect(parseServerMessage({ type: 'heartbeat', v: 1 }).ok).toBe(false); // missing serverTime
+    expect(parseServerMessage({ type: 'heartbeat', v: 1, serverTime: 123 }).ok).toBe(false); // wrong type
+  });
+
+  it('accepts a snapshot with or without heartbeatMs, and rejects a bad heartbeatMs', () => {
+    const base = {
+      type: 'snapshot',
+      v: 1,
+      source: 'pandascore',
+      stale: false,
+      lastUpdated: null,
+      message: null,
+      serverTime: 'x',
+      matches: [match],
+    };
+    expect(parseServerMessage(base).ok).toBe(true); // without heartbeatMs
+    expect(parseServerMessage({ ...base, heartbeatMs: 20000 }).ok).toBe(true); // valid
+    expect(parseServerMessage({ ...base, heartbeatMs: -5 }).ok).toBe(false); // negative
   });
 });

@@ -10,10 +10,29 @@ describe('applyServerMessage', () => {
     expect(s.hasSnapshot).toBe(true);
     expect(Object.keys(s.matches)).toEqual(['a', 'b']);
 
-    const a2 = { ...a, teams: [{ ...a.teams[0], score: 2 }, a.teams[1]] as typeof a.teams };
-    s = applyServerMessage(s, { type: 'diff', v: 1, serverTime: 'T', upserted: [a2], removed: ['b'] });
+    const a2 = {
+      ...a,
+      teams: [{ ...a.teams[0], score: 2 }, a.teams[1]] as typeof a.teams,
+    };
+    s = applyServerMessage(s, {
+      type: 'diff',
+      v: 1,
+      serverTime: 'T',
+      upserted: [a2],
+      removed: ['b'],
+    });
     expect(s.matches).toEqual({ a: a2 });
     expect(s.lastUpdated).toBe('T');
+  });
+
+  it('ignores heartbeat messages: state is returned unchanged', () => {
+    const state = applyServerMessage(initialLiveState, snapshot([makeMatch()]));
+    const next = applyServerMessage(state, {
+      type: 'heartbeat',
+      v: 1,
+      serverTime: 'x',
+    });
+    expect(next).toBe(state);
   });
 
   it('ignores diffs received before the first snapshot', () => {
@@ -37,9 +56,18 @@ describe('applyServerMessage', () => {
       lastUpdated: null,
       message: 'upstream down',
     });
-    expect(s).toMatchObject({ source: 'pandascore', stale: true, statusMessage: 'upstream down' });
+    expect(s).toMatchObject({
+      source: 'pandascore',
+      stale: true,
+      statusMessage: 'upstream down',
+    });
     expect(s.lastUpdated).toBe('2026-10-06T15:00:00.000Z'); // kept when status has none
-    s = applyServerMessage(s, { type: 'error', v: 1, code: 'X', message: 'boom' });
+    s = applyServerMessage(s, {
+      type: 'error',
+      v: 1,
+      code: 'X',
+      message: 'boom',
+    });
     expect(s.serverError).toBe('boom');
   });
 });
@@ -47,11 +75,27 @@ describe('applyServerMessage', () => {
 describe('groupMatches', () => {
   it('orders running, then upcoming (soonest first), then results (newest first)', () => {
     const g = groupMatches([
-      makeMatch({ id: 'f-old', status: 'finished', endAt: '2026-10-05T10:00:00Z' }),
-      makeMatch({ id: 'u-late', status: 'upcoming', scheduledAt: '2026-10-07T10:00:00Z' }),
+      makeMatch({
+        id: 'f-old',
+        status: 'finished',
+        endAt: '2026-10-05T10:00:00Z',
+      }),
+      makeMatch({
+        id: 'u-late',
+        status: 'upcoming',
+        scheduledAt: '2026-10-07T10:00:00Z',
+      }),
       makeMatch({ id: 'r', status: 'running' }),
-      makeMatch({ id: 'u-soon', status: 'upcoming', scheduledAt: '2026-10-06T18:00:00Z' }),
-      makeMatch({ id: 'f-new', status: 'finished', endAt: '2026-10-06T10:00:00Z' }),
+      makeMatch({
+        id: 'u-soon',
+        status: 'upcoming',
+        scheduledAt: '2026-10-06T18:00:00Z',
+      }),
+      makeMatch({
+        id: 'f-new',
+        status: 'finished',
+        endAt: '2026-10-06T10:00:00Z',
+      }),
       makeMatch({ id: 'u-tbd', status: 'upcoming', scheduledAt: null }),
     ]);
     expect(g.running.map((m) => m.id)).toEqual(['r']);
@@ -64,14 +108,23 @@ describe('describeChanges', () => {
   const base = makeMatch({ id: 'a', status: 'running' });
 
   it('announces score changes, going live and final results', () => {
-    const scored = { ...base, teams: [{ ...base.teams[0], score: 2 }, base.teams[1]] as typeof base.teams };
-    expect(describeChanges({ a: base }, [scored])).toEqual(['Score update: Alpha Squad 2–0 Bravo Five']);
+    const scored = {
+      ...base,
+      teams: [{ ...base.teams[0], score: 2 }, base.teams[1]] as typeof base.teams,
+    };
+    expect(describeChanges({ a: base }, [scored])).toEqual([
+      'Score update: Alpha Squad 2–0 Bravo Five',
+    ]);
 
     const upcoming = { ...base, status: 'upcoming' as const };
-    expect(describeChanges({ a: upcoming }, [base])).toEqual(['Now live: Alpha Squad versus Bravo Five']);
+    expect(describeChanges({ a: upcoming }, [base])).toEqual([
+      'Now live: Alpha Squad versus Bravo Five',
+    ]);
 
     const done = { ...scored, status: 'finished' as const, winnerId: 'a' };
-    expect(describeChanges({ a: base }, [done])).toEqual(['Alpha Squad won: Alpha Squad 2–0 Bravo Five']);
+    expect(describeChanges({ a: base }, [done])).toEqual([
+      'Alpha Squad won: Alpha Squad 2–0 Bravo Five',
+    ]);
   });
 
   it('stays quiet for new matches and unchanged scores', () => {
