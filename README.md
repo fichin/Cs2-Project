@@ -49,7 +49,7 @@ live matches first, then upcoming matches, then recent results.
 
 | Folder    | What's inside |
 | --------- | ------------- |
-| `shared/` | `Match` model and WebSocket message types (`snapshot`, `diff`, `status`, `error`), plus zod validators |
+| `shared/` | `Match` model and WebSocket message types (`snapshot`, `diff`, `status`, `error`, `heartbeat`), plus zod validators |
 | `server/` | Express + `ws` server, `MatchSource` adapters, poll/diff loop, rate-limit and backoff logic, token redaction |
 | `client/` | React + TypeScript + Vite UI in plain CSS with design tokens and no UI library |
 
@@ -57,12 +57,23 @@ live matches first, then upcoming matches, then recent results.
 
 | `type`     | When | Payload |
 | ---------- | ---- | ------- |
-| `snapshot` | Immediately after connecting, and after a source switch | `source`, `stale`, `lastUpdated`, `message`, all `matches` |
+| `snapshot` | Immediately after connecting, and after a source switch | `source`, `stale`, `lastUpdated`, `message`, all `matches`, optional `heartbeatMs` |
 | `diff`     | After a poll that changed something | `upserted: Match[]`, `removed: id[]` |
 | `status`   | Freshness or source changed (e.g. upstream down, so `stale: true`) | `source`, `stale`, `lastUpdated`, `message` |
 | `error`    | Server-side problem worth showing | `code`, `message` |
+| `heartbeat` | Every `HEARTBEAT_MS`, so clients can tell a quiet server from a dead connection | `serverTime` |
 
 Every message carries `v: 1`, the protocol version.
+
+### Dead connection detection
+
+Browsers can't see WebSocket ping frames, so a silently dropped connection (laptop sleep, a proxy timing
+out) could leave the UI showing "Live" with frozen data. The server therefore sends a `heartbeat` message
+every `HEARTBEAT_MS` and announces that interval as `heartbeatMs` in every snapshot. The client runs a
+watchdog: after 3 × `heartbeatMs` without a valid message (and immediately when a backgrounded tab becomes
+visible again), it drops the socket, shows "Reconnecting…" and reconnects with backoff, then receives a
+fresh snapshot. If a snapshot has no `heartbeatMs` (an older server that sends no heartbeats), the client
+never arms the watchdog, so healthy connections aren't cut.
 
 ## Running locally
 
@@ -106,6 +117,7 @@ Server (`server/.env`, loaded with dotenv; see `server/.env.example`):
 | `TRUST_PROXY` | `false` | Set `true` behind a reverse proxy so the per-IP limit uses `X-Forwarded-For` |
 | `FORCE_SOURCE` | *(empty)* | `fixture` forces demo data even when a token is set |
 | `FIXTURE_INTERVAL_MS` | `5000` | Tick interval for demo data (local only, no API cost) |
+| `HEARTBEAT_MS` | `20000` | Interval of the WebSocket `heartbeat` message. Clamped to 5,000-60,000 with a logged warning. |
 | `HOST` | *(all interfaces)* | Bind address |
 
 Client (`client/.env`, see `client/.env.example`):

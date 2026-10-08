@@ -12,6 +12,10 @@ const emptyToUndefined = (v: unknown) => (typeof v === 'string' && v.trim() === 
 /** Never poll the upstream API faster than this, whatever the env says. */
 export const MIN_POLL_INTERVAL_MS = 10_000;
 
+/** Allowed range for the application-level heartbeat sent to WebSocket clients. */
+export const MIN_HEARTBEAT_MS = 5_000;
+export const MAX_HEARTBEAT_MS = 60_000;
+
 const envSchema = z.object({
   PANDASCORE_TOKEN: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   PORT: z.coerce.number().int().min(0).max(65_535).default(3001),
@@ -36,16 +40,25 @@ const envSchema = z.object({
     .transform((v) => v === 'true'),
   FORCE_SOURCE: z.preprocess(emptyToUndefined, z.enum(['fixture', 'pandascore']).optional()),
   FIXTURE_INTERVAL_MS: z.coerce.number().int().min(1_000).default(5_000),
+  HEARTBEAT_MS: z.coerce.number().int().default(20_000),
 });
 
 export type Config = z.infer<typeof envSchema>;
 
-export function parseConfig(env: NodeJS.ProcessEnv): Config {
+export function parseConfig(env: NodeJS.ProcessEnv, warn: (message: string) => void = () => {}): Config {
   const result = envSchema.safeParse(env);
   if (!result.success) {
     // Only report variable names, never values (one of them is a secret).
     const fields = [...new Set(result.error.issues.map((i) => i.path.join('.')))].join(', ');
     throw new Error(`Invalid environment configuration: ${fields}`);
   }
-  return result.data;
+  const config = result.data;
+  const heartbeat = Math.min(MAX_HEARTBEAT_MS, Math.max(MIN_HEARTBEAT_MS, config.HEARTBEAT_MS));
+  if (heartbeat !== config.HEARTBEAT_MS) {
+    warn(
+      `HEARTBEAT_MS=${config.HEARTBEAT_MS} is outside ${MIN_HEARTBEAT_MS}-${MAX_HEARTBEAT_MS}; using ${heartbeat}`,
+    );
+    config.HEARTBEAT_MS = heartbeat;
+  }
+  return config;
 }

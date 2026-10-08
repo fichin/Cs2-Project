@@ -17,6 +17,7 @@ export const snapshotMessageSchema = z.object({
   message: z.string().nullable(),
   serverTime: z.string(),
   matches: z.array(matchSchema),
+  heartbeatMs: z.number().int().positive().optional(),
 });
 
 /** Only the matches that changed since the previous poll. */
@@ -45,11 +46,19 @@ export const errorMessageSchema = z.object({
   message: z.string(),
 });
 
+/** Tiny "I'm alive" message so the client can tell a silent dead connection from a quiet server. */
+export const heartbeatMessageSchema = z.object({
+  type: z.literal('heartbeat'),
+  v,
+  serverTime: z.string(),
+});
+
 export const serverMessageSchema = z.discriminatedUnion('type', [
   snapshotMessageSchema,
   diffMessageSchema,
   statusMessageSchema,
   errorMessageSchema,
+  heartbeatMessageSchema,
 ]);
 
 export type SnapshotMessage = z.infer<typeof snapshotMessageSchema>;
@@ -57,6 +66,7 @@ export type DiffMessage = z.infer<typeof diffMessageSchema>;
 export type StatusMessage = z.infer<typeof statusMessageSchema>;
 export type ErrorMessage = z.infer<typeof errorMessageSchema>;
 export type ServerMessage = z.infer<typeof serverMessageSchema>;
+export type HeartbeatMessage = z.infer<typeof heartbeatMessageSchema>;
 
 export type ParseResult = { ok: true; message: ServerMessage } | { ok: false; error: string };
 
@@ -72,7 +82,10 @@ export function parseServerMessage(raw: unknown): ParseResult {
   }
   const result = serverMessageSchema.safeParse(data);
   if (!result.success) {
-    return { ok: false, error: result.error.issues[0]?.message ?? 'invalid message' };
+    return {
+      ok: false,
+      error: result.error.issues[0]?.message ?? 'invalid message',
+    };
   }
   return { ok: true, message: result.data };
 }
