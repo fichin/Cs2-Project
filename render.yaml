@@ -1,0 +1,25 @@
+# Render Blueprint for the esports-live server (WebSocket + /health). The client is deployed separately.
+# Secrets are never stored here: `sync: false` makes Render ask for the value in its dashboard.
+services:
+  - type: web
+    name: esports-live-server
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    # Build tools (tsup, TypeScript) are devDependencies, so install them for the build.
+    buildCommand: npm ci --include=dev && npm run build -w server
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PANDASCORE_TOKEN
+        sync: false
+      - key: ALLOWED_ORIGIN # exact client URL, e.g. https://esports-live.vercel.app
+        sync: false
+      - key: TRUST_PROXY # Render sits behind a proxy; needed for correct per-IP limits
+        value: "true"
+      - key: HEARTBEAT_MS
+        value: "20000"
+      - key: POLL_INTERVAL_MS
+        value: "30000"
