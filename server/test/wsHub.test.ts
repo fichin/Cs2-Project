@@ -211,3 +211,70 @@ describe('WebSocket hub heartbeat', () => {
     }
   });
 });
+
+/** A separate hub with custom options, for tests that need their own limits. */
+async function startTestHub(overrides: Partial<Parameters<typeof attachWsHub>[1]> = {}) {
+  const testServer = createServer();
+  const testHub = attachWsHub(testServer, {
+    path: '/ws',
+    allowedOrigins: [ORIGIN],
+    maxConnectionsPerIp: 10,
+    heartbeatMs: 60_000,
+    getSnapshot: () => store.snapshot(),
+    logger: silentLogger,
+    ...overrides,
+  });
+  await new Promise<void>((r) => testServer.listen(0, '127.0.0.1', r));
+  const { port } = testServer.address() as AddressInfo;
+  const stop = async () => {
+    await testHub.close();
+    await new Promise<void>((r) => testServer.close(() => r()));
+  };
+  return { hub: testHub, url: `ws://127.0.0.1:${port}/ws`, stop };
+}
+
+/** Open `n` connections at once and count how many were accepted vs rejected (by HTTP status). */
+async function openMany(url: string, n: number, headersFor: (i: number) => Record<string, string> = () => ({})) {
+  const sockets: WebSocket[] = [];
+  const results = await Promise.all(
+    Array.from(
+      { length: n },
+      (_, i) =>
+        new Promise<number>((resolve) => {
+          const ws = new WebSocket(url, { origin: ORIGIN, headers: headersFor(i) });
+          sockets.push(ws);
+          ws.once('open', () => resolve(101));
+          ws.once('unexpected-response', (_req, res) => resolve(res.statusCode ?? 0));
+          ws.once('error', () => resolve(-1));
+        }),
+    ),
+  );
+  for (const ws of sockets) ws.terminate();
+  return { accepted: results.filter((s) => s === 101).length, statuses: results };
+}
+
+describe('WebSocket hub behind a proxy (TRUST_PROXY)', () => {
+  it('limits per IP by the LAST X-Forwarded-For entry, so a spoofed first entry does not help', async () => {
+    const t = await startTestHub({ trustProxy: true, maxConnectionsPerIp: 10 });
+    try {
+      // Each client claims a different "first" IP, but the proxy-appended last entry is the same.
+      const { accepted, statuses } = await openMany(t.url, 12, (i) => ({
+        'X-Forwarded-For': `10.0.0.${i}, 203.0.113.7`,
+      }));
+      expect(accepted).toBe(10);
+      expect(statuses.filter((s) => s === 429)).toHaveLength(2);
+    } finally {
+      await t.stop();
+    }
+  });
+
+  it('falls back to the socket address when X-Forwarded-For is missing or empty', async () => {
+    const t = await startTestHub({ trustProxy: true, maxConnectionsPerIp: 2 });
+    try {
+      const { accepted } = await openMany(t.url, 3, (i): Record<string, string> => (i === 0 ? { 'X-Forwarded-For': ' , ' } : {}));
+      expect(accepted).toBe(2); // all three count as 127.0.0.1
+    } finally {
+      await t.stop();
+    }
+  });
+});

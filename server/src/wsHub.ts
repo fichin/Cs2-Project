@@ -32,11 +32,16 @@ interface TrackedSocket extends WebSocket {
   ip?: string;
 }
 
-function clientIp(req: IncomingMessage, trustProxy: boolean): string {
+export function clientIp(req: IncomingMessage, trustProxy: boolean): string {
   if (trustProxy) {
+    // Clients can send their own X-Forwarded-For; only the LAST entry is added by our proxy (Render).
     const fwd = req.headers['x-forwarded-for'];
-    const first = (Array.isArray(fwd) ? fwd[0] : fwd)?.split(',')[0]?.trim();
-    if (first) return first;
+    const entries = (Array.isArray(fwd) ? fwd.join(',') : (fwd ?? ''))
+      .split(',')
+      .map((e) => e.trim())
+      .filter(Boolean);
+    const last = entries.at(-1);
+    if (last) return last;
   }
   return req.socket.remoteAddress ?? 'unknown';
 }
