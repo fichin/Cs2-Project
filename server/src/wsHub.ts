@@ -103,7 +103,14 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
     const ip = clientIp(req, trustProxy);
     const count = perIp.get(ip) ?? 0;
     if (count >= opts.maxConnectionsPerIp) {
-      warnRejected('per-ip', `Rejected WebSocket upgrade: too many connections from one IP (${count})`);
+      // TEMPORARY diagnostic: the raw X-Forwarded-For value is logged only to verify which entry
+      // Render's proxy appends. Remove the `xff=` part once that is confirmed.
+      const fwd = req.headers['x-forwarded-for'];
+      const rawXff = (Array.isArray(fwd) ? fwd.join(', ') : fwd)?.slice(0, 200) || '-';
+      warnRejected(
+        'per-ip',
+        `Rejected WebSocket upgrade: too many connections from one IP (${count}) ip=${ip} xff=${rawXff}`,
+      );
       return reject(socket, 429, 'Too Many Requests');
     }
 
