@@ -6,11 +6,29 @@ export const SOURCES = ['pandascore', 'fixture'] as const;
 export const matchStatusSchema = z.enum(MATCH_STATUSES);
 export const sourceSchema = z.enum(SOURCES);
 
+/**
+ * True only for absolute http(s) URLs: anything else (javascript:, data:, relative) is unsafe to render.
+ * A scheme check rather than `new URL()`, so this shared code needs no DOM or Node types; the server's
+ * mapper does the full parse.
+ */
+export function isHttpUrl(value: string): boolean {
+  return /^https?:\/\/[^\s/?#]+\S*$/i.test(value);
+}
+
+/**
+ * Logo and stream links. A string that isn't an http(s) URL is dropped to null (as the server's
+ * mapper already does), so one bad link can't get a whole snapshot or diff rejected.
+ */
+const httpUrlOrNull = z.preprocess(
+  (v) => (typeof v === 'string' && !isHttpUrl(v) ? null : v),
+  z.string().refine(isHttpUrl, 'must be an http(s) URL').nullable(),
+);
+
 export const teamSchema = z.object({
   id: z.string(),
   name: z.string(),
   acronym: z.string().nullable(),
-  logoUrl: z.string().nullable(),
+  logoUrl: httpUrlOrNull,
   score: z.number().int().nonnegative(),
 });
 
@@ -29,7 +47,7 @@ export const matchSchema = z.object({
   beginAt: z.string().nullable(),
   endAt: z.string().nullable(),
   winnerId: z.string().nullable(),
-  streamUrl: z.string().nullable(),
+  streamUrl: httpUrlOrNull,
   source: sourceSchema,
 });
 

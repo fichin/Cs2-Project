@@ -134,3 +134,39 @@ describe('parseServerMessage', () => {
     expect(parseServerMessage({ ...base, heartbeatMs: -5 }).ok).toBe(false); // negative
   });
 });
+
+describe('logo and stream URLs', () => {
+  const diffWith = (logoUrl: unknown, streamUrl: unknown) => ({
+    type: 'diff',
+    v: 1,
+    serverTime: 'x',
+    upserted: [{ ...match, teams: [{ ...match.teams[0], logoUrl }, match.teams[1]], streamUrl }],
+    removed: [],
+  });
+  const firstMatch = (r: ReturnType<typeof parseServerMessage>) =>
+    r.ok && r.message.type === 'diff' ? r.message.upserted[0] : undefined;
+
+  it('keeps http(s) URLs and null', () => {
+    const r = parseServerMessage(diffWith('https://cdn.example.com/a.png', null));
+    expect(firstMatch(r)?.teams[0].logoUrl).toBe('https://cdn.example.com/a.png');
+    expect(firstMatch(r)?.streamUrl).toBeNull();
+    expect(firstMatch(parseServerMessage(diffWith(null, 'http://kick.com/x')))?.streamUrl).toBe('http://kick.com/x');
+  });
+
+  it('drops non-http(s) strings to null instead of rejecting the whole message', () => {
+    for (const bad of ['javascript:alert(1)', 'data:image/png;base64,AA', '/relative.png', 'ftp://x.com', '']) {
+      const r = parseServerMessage(diffWith(bad, bad));
+      expect(r.ok).toBe(true);
+      expect(firstMatch(r)?.teams[0].logoUrl).toBeNull();
+      expect(firstMatch(r)?.streamUrl).toBeNull();
+    }
+  });
+
+  it('still rejects wrong types and missing fields', () => {
+    expect(parseServerMessage(diffWith(123, null)).ok).toBe(false);
+    const { streamUrl: _omit, ...withoutStream } = match;
+    expect(parseServerMessage({ type: 'diff', v: 1, serverTime: 'x', upserted: [withoutStream], removed: [] }).ok).toBe(
+      false,
+    );
+  });
+});
