@@ -31,7 +31,7 @@ beforeEach(async () => {
     getSnapshot: () => store.snapshot(),
     logger: silentLogger,
   });
-  server.on('request', createApp({ store, clientCount: hub.clientCount, allowedOrigins: [ORIGIN] }));
+  server.on('request', createApp({ allowedOrigins: [ORIGIN] }));
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
   const { port } = server.address() as AddressInfo;
   url = `ws://127.0.0.1:${port}/ws`;
@@ -120,12 +120,12 @@ describe('WebSocket hub', () => {
     await vi.waitFor(() => expect(hub.clientCount()).toBe(0));
   });
 
-  it('GET /health reports the source and freshness', async () => {
+  it('GET /health returns only { status: "ok" }', async () => {
     const res = await fetch(`${httpUrl}/health`, { headers: { Origin: ORIGIN } });
     expect(res.status).toBe(200);
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
     expect(res.headers.get('x-powered-by')).toBeNull();
-    expect(await res.json()).toMatchObject({ status: 'ok', source: 'fixture', stale: false, matches: 1 });
+    expect(await res.json()).toEqual({ status: 'ok' });
   });
 
   it('close() disconnects clients with 1001 (graceful shutdown)', async () => {

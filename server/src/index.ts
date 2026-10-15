@@ -38,10 +38,7 @@ const hub = attachWsHub(server, {
   getSnapshot: () => store.snapshot(),
   logger,
 });
-server.on(
-  'request',
-  createApp({ store, clientCount: hub.clientCount, allowedOrigins: config.ALLOWED_ORIGIN }),
-);
+server.on('request', createApp({ allowedOrigins: config.ALLOWED_ORIGIN }));
 
 const poller = new Poller({
   source: selection.source,
