@@ -32,6 +32,7 @@ const hub = attachWsHub(server, {
   path: '/ws',
   allowedOrigins: config.ALLOWED_ORIGIN,
   maxConnectionsPerIp: config.MAX_CONNECTIONS_PER_IP,
+  maxConnections: config.MAX_CONNECTIONS,
   trustProxy: config.TRUST_PROXY,
   heartbeatMs: config.HEARTBEAT_MS,
   getSnapshot: () => store.snapshot(),

@@ -8,6 +8,8 @@ export interface WsHubOptions {
   path: string;
   allowedOrigins: readonly string[];
   maxConnectionsPerIp: number;
+  /** Cap on concurrent connections across all clients; extra upgrades get 503. */
+  maxConnections?: number;
   /** Clients only ever need to answer pings; anything bigger is rejected by `ws` (close 1009). */
   maxPayloadBytes?: number;
   /** Protocol-level ping/pong used to terminate dead clients (invisible to browser JS). */
@@ -59,6 +61,7 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
     heartbeatMs = 20_000,
     maxBufferedBytes = 1024 * 1024,
     trustProxy = false,
+    maxConnections = 200,
   } = opts;
   const wss = new WebSocketServer({ noServer: true, maxPayload: maxPayloadBytes, perMessageDeflate: false });
   const perIp = new Map<string, number>();
@@ -85,6 +88,11 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
     if (!origin || !allowed.has(origin)) {
       logger.warn(`Rejected WebSocket upgrade from disallowed origin: ${origin ?? '(none)'}`);
       return reject(socket, 403, 'Forbidden');
+    }
+
+    if (wss.clients.size >= maxConnections) {
+      logger.warn(`Rejected WebSocket upgrade: server is at its connection limit (${maxConnections})`);
+      return reject(socket, 503, 'Service Unavailable');
     }
 
     const ip = clientIp(req, trustProxy);

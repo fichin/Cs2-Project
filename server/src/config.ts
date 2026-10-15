@@ -16,6 +16,10 @@ export const MIN_POLL_INTERVAL_MS = 10_000;
 export const MIN_HEARTBEAT_MS = 5_000;
 export const MAX_HEARTBEAT_MS = 60_000;
 
+/** Allowed range for the total number of concurrent WebSocket connections. */
+export const MIN_MAX_CONNECTIONS = 1;
+export const MAX_MAX_CONNECTIONS = 10_000;
+
 const envSchema = z.object({
   PANDASCORE_TOKEN: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   PORT: z.coerce.number().int().min(0).max(65_535).default(3001),
@@ -41,6 +45,7 @@ const envSchema = z.object({
   FORCE_SOURCE: z.preprocess(emptyToUndefined, z.enum(['fixture', 'pandascore']).optional()),
   FIXTURE_INTERVAL_MS: z.coerce.number().int().min(1_000).default(5_000),
   HEARTBEAT_MS: z.coerce.number().int().default(20_000),
+  MAX_CONNECTIONS: z.coerce.number().int().default(200),
 });
 
 export type Config = z.infer<typeof envSchema>;
@@ -59,6 +64,13 @@ export function parseConfig(env: NodeJS.ProcessEnv, warn: (message: string) => v
       `HEARTBEAT_MS=${config.HEARTBEAT_MS} is outside ${MIN_HEARTBEAT_MS}-${MAX_HEARTBEAT_MS}; using ${heartbeat}`,
     );
     config.HEARTBEAT_MS = heartbeat;
+  }
+  const maxConnections = Math.min(MAX_MAX_CONNECTIONS, Math.max(MIN_MAX_CONNECTIONS, config.MAX_CONNECTIONS));
+  if (maxConnections !== config.MAX_CONNECTIONS) {
+    warn(
+      `MAX_CONNECTIONS=${config.MAX_CONNECTIONS} is outside ${MIN_MAX_CONNECTIONS}-${MAX_MAX_CONNECTIONS}; using ${maxConnections}`,
+    );
+    config.MAX_CONNECTIONS = maxConnections;
   }
   return config;
 }

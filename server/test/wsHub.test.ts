@@ -278,3 +278,31 @@ describe('WebSocket hub behind a proxy (TRUST_PROXY)', () => {
     }
   });
 });
+
+describe('WebSocket hub total connection cap (MAX_CONNECTIONS)', () => {
+  it('rejects upgrades with 503 once the cap is reached, without crashing', async () => {
+    const t = await startTestHub({ maxConnections: 3, maxConnectionsPerIp: 100 });
+    try {
+      const { accepted, statuses } = await openMany(t.url, 5);
+      expect(accepted).toBe(3);
+      expect(statuses.filter((s) => s === 503)).toHaveLength(2);
+    } finally {
+      await t.stop();
+    }
+  });
+
+  it('accepts new connections again after others disconnect', async () => {
+    const t = await startTestHub({ maxConnections: 1, maxConnectionsPerIp: 100 });
+    try {
+      const first = connect(ORIGIN, t.url);
+      await first.next(1);
+      expect((await openMany(t.url, 1)).statuses).toEqual([503]);
+
+      first.ws.close();
+      await vi.waitFor(() => expect(t.hub.clientCount()).toBe(0));
+      expect((await openMany(t.url, 1)).accepted).toBe(1);
+    } finally {
+      await t.stop();
+    }
+  });
+});
