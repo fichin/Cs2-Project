@@ -306,3 +306,28 @@ describe('WebSocket hub total connection cap (MAX_CONNECTIONS)', () => {
     }
   });
 });
+
+describe('WebSocket hub rejection logging', () => {
+  it('logs a flood of disallowed-origin upgrades only once per interval', async () => {
+    const lines: string[] = [];
+    const logger = { info: () => {}, warn: (m: string) => lines.push(m), error: () => {} };
+    const t = await startTestHub({ logger, rejectLogIntervalMs: 60_000 });
+    try {
+      const results = await Promise.all(
+        Array.from(
+          { length: 20 },
+          () =>
+            new Promise<number>((resolve) => {
+              const ws = new WebSocket(t.url, { origin: 'https://evil.example' });
+              ws.once('unexpected-response', (_req, res) => resolve(res.statusCode ?? 0));
+              ws.once('error', () => resolve(-1));
+            }),
+        ),
+      );
+      expect(results.every((s) => s === 403)).toBe(true);
+      expect(lines.filter((l) => l.includes('disallowed origin'))).toHaveLength(1);
+    } finally {
+      await t.stop();
+    }
+  });
+});

@@ -2,6 +2,7 @@ import type { IncomingMessage, Server } from 'node:http';
 import type { Duplex } from 'node:stream';
 import { PROTOCOL_VERSION, type ServerMessage, serializeServerMessage } from '@esports-live/shared';
 import { WebSocket, WebSocketServer } from 'ws';
+import { createThrottledWarn } from './logThrottle.js';
 import type { Logger } from './logger.js';
 
 export interface WsHubOptions {
@@ -19,6 +20,8 @@ export interface WsHubOptions {
   /** Drop clients whose send buffer grows past this (they can't keep up). */
   maxBufferedBytes?: number;
   trustProxy?: boolean;
+  /** Rejected-upgrade warnings are logged at most once per this interval (per reason). */
+  rejectLogIntervalMs?: number;
   getSnapshot: () => ServerMessage;
   logger: Logger;
 }
@@ -62,10 +65,12 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
     maxBufferedBytes = 1024 * 1024,
     trustProxy = false,
     maxConnections = 200,
+    rejectLogIntervalMs = 60_000,
   } = opts;
   const wss = new WebSocketServer({ noServer: true, maxPayload: maxPayloadBytes, perMessageDeflate: false });
   const perIp = new Map<string, number>();
   const allowed = new Set(opts.allowedOrigins);
+  const warnRejected = createThrottledWarn(logger, rejectLogIntervalMs);
 
   const send = (ws: WebSocket, frame: string) => {
     if (ws.readyState !== WebSocket.OPEN) return;
@@ -86,19 +91,19 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
 
     const origin = req.headers.origin;
     if (!origin || !allowed.has(origin)) {
-      logger.warn(`Rejected WebSocket upgrade from disallowed origin: ${origin ?? '(none)'}`);
+      warnRejected('origin', `Rejected WebSocket upgrade from disallowed origin: ${origin ?? '(none)'}`);
       return reject(socket, 403, 'Forbidden');
     }
 
     if (wss.clients.size >= maxConnections) {
-      logger.warn(`Rejected WebSocket upgrade: server is at its connection limit (${maxConnections})`);
+      warnRejected('capacity', `Rejected WebSocket upgrade: server is at its connection limit (${maxConnections})`);
       return reject(socket, 503, 'Service Unavailable');
     }
 
     const ip = clientIp(req, trustProxy);
     const count = perIp.get(ip) ?? 0;
     if (count >= opts.maxConnectionsPerIp) {
-      logger.warn(`Rejected WebSocket upgrade: too many connections from one IP (${count})`);
+      warnRejected('per-ip', `Rejected WebSocket upgrade: too many connections from one IP (${count})`);
       return reject(socket, 429, 'Too Many Requests');
     }
 
