@@ -344,26 +344,17 @@ describe('WebSocket hub rejection logging', () => {
     }
   }
 
-  it('logs the IP used for the per-IP limit and the raw X-Forwarded-For value, once per interval', async () => {
+  it('logs the IP used for the per-IP limit, once per interval', async () => {
     const { statuses, perIp } = await perIpRejectionLines(true, () => ({ 'X-Forwarded-For': '10.0.0.9, 203.0.113.7' }), 4);
     expect(statuses.filter((s) => s === 429)).toHaveLength(3);
     expect(perIp).toHaveLength(1); // still rate-limited to one line per minute
-    expect(perIp[0]).toContain('ip=203.0.113.7');
-    expect(perIp[0]).toContain('xff=10.0.0.9, 203.0.113.7');
+    expect(perIp[0]).toMatch(/ip=203\.0\.113\.7$/);
+    expect(perIp[0]).not.toContain('10.0.0.9'); // the raw header is not logged
   });
 
-  it('logs the socket address and "-" when there is no X-Forwarded-For header', async () => {
+  it('logs the socket address when there is no X-Forwarded-For header', async () => {
     const { perIp } = await perIpRejectionLines(false, () => ({}));
     expect(perIp).toHaveLength(1);
-    expect(perIp[0]).toMatch(/ip=(127\.0\.0\.1|::ffff:127\.0\.0\.1) xff=-$/);
-  });
-
-  it('truncates a long X-Forwarded-For value to 200 characters', async () => {
-    const long = `${'1.2.3.4, '.repeat(40)}203.0.113.7`;
-    const { perIp } = await perIpRejectionLines(true, () => ({ 'X-Forwarded-For': long }));
-    const xff = perIp[0]!.split('xff=')[1]!;
-    expect(xff).toHaveLength(200);
-    expect(long.startsWith(xff)).toBe(true);
-    expect(perIp[0]).toContain('ip=203.0.113.7'); // the limit still uses the last entry
+    expect(perIp[0]).toMatch(/ip=(127\.0\.0\.1|::ffff:127\.0\.0\.1)$/);
   });
 });
