@@ -221,3 +221,7 @@ The tests run with Vitest and never call the real API. They cover the message pr
 redaction, rate limiting and backoff, PandaScore mapping (against saved sample responses), source selection and
 config, the WebSocket hub (origin checks, connection limits, heartbeat), and on the client the reconnect logic,
 the dead-connection watchdog and the scoreboard components.
+
+## License
+
+License: MIT. See [LICENSE](LICENSE).
