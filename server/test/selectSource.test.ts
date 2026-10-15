@@ -52,6 +52,19 @@ describe('parseConfig', () => {
     expect(warnings[0]).toMatch(/HEARTBEAT_MS=1000 .*using 5000/);
   });
 
+  it('clamps MAX_CONNECTIONS into 1-10000 and warns, without crashing', () => {
+    const warnings: string[] = [];
+    const warn = (m: string) => warnings.push(m);
+    expect(parseConfig({}, warn).MAX_CONNECTIONS).toBe(200);
+    expect(parseConfig({ MAX_CONNECTIONS: '500' }, warn).MAX_CONNECTIONS).toBe(500);
+    expect(warnings).toEqual([]);
+
+    expect(parseConfig({ MAX_CONNECTIONS: '0' }, warn).MAX_CONNECTIONS).toBe(1);
+    expect(parseConfig({ MAX_CONNECTIONS: '99999' }, warn).MAX_CONNECTIONS).toBe(10_000);
+    expect(warnings).toHaveLength(2);
+    expect(warnings[0]).toMatch(/MAX_CONNECTIONS=0 .*using 1/);
+  });
+
   it('accepts a comma-separated origin list', () => {
     expect(parseConfig({ ALLOWED_ORIGIN: 'https://a.dev/, http://b.dev' }).ALLOWED_ORIGIN).toEqual([
       'https://a.dev',

@@ -182,7 +182,7 @@ export class PandaScoreSource implements MatchSource {
     return wait;
   }
 
-  /** Exposed for diagnostics (/health) — contains no secrets. */
+  /** Request budget and backoff state for diagnostics; contains no secrets. */
   stats(): { budgetRemaining: number; backingOffMs: number } {
     return { budgetRemaining: this.budget.remaining(), backingOffMs: Math.max(0, this.retryAt - this.now()) };
   }

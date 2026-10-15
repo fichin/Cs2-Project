@@ -1,14 +1,10 @@
 import express, { type Express } from 'express';
-import type { MatchStore } from './store.js';
 
-export interface HealthInfo {
-  store: MatchStore;
-  clientCount: () => number;
+export interface AppOptions {
   allowedOrigins: readonly string[];
-  startedAt?: number;
 }
 
-export function createApp({ store, clientCount, allowedOrigins, startedAt = Date.now() }: HealthInfo): Express {
+export function createApp({ allowedOrigins }: AppOptions): Express {
   const app = express();
   app.disable('x-powered-by');
 
@@ -23,17 +19,10 @@ export function createApp({ store, clientCount, allowedOrigins, startedAt = Date
     next();
   });
 
+  // Liveness only: anything more (client count, uptime, source) is not needed publicly.
   app.get('/health', (_req, res) => {
     res.setHeader('Cache-Control', 'no-store');
-    res.json({
-      status: 'ok',
-      source: store.source,
-      stale: store.stale,
-      lastUpdated: store.lastUpdated,
-      matches: store.size,
-      clients: clientCount(),
-      uptimeSec: Math.round((Date.now() - startedAt) / 1000),
-    });
+    res.json({ status: 'ok' });
   });
 
   app.use((_req, res) => {

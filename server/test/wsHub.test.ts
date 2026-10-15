@@ -31,7 +31,7 @@ beforeEach(async () => {
     getSnapshot: () => store.snapshot(),
     logger: silentLogger,
   });
-  server.on('request', createApp({ store, clientCount: hub.clientCount, allowedOrigins: [ORIGIN] }));
+  server.on('request', createApp({ allowedOrigins: [ORIGIN] }));
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
   const { port } = server.address() as AddressInfo;
   url = `ws://127.0.0.1:${port}/ws`;
@@ -120,12 +120,12 @@ describe('WebSocket hub', () => {
     await vi.waitFor(() => expect(hub.clientCount()).toBe(0));
   });
 
-  it('GET /health reports the source and freshness', async () => {
+  it('GET /health returns only { status: "ok" }', async () => {
     const res = await fetch(`${httpUrl}/health`, { headers: { Origin: ORIGIN } });
     expect(res.status).toBe(200);
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
     expect(res.headers.get('x-powered-by')).toBeNull();
-    expect(await res.json()).toMatchObject({ status: 'ok', source: 'fixture', stale: false, matches: 1 });
+    expect(await res.json()).toEqual({ status: 'ok' });
   });
 
   it('close() disconnects clients with 1001 (graceful shutdown)', async () => {
@@ -208,6 +208,126 @@ describe('WebSocket hub heartbeat', () => {
     } finally {
       setSpy.mockRestore();
       clearSpy.mockRestore();
+    }
+  });
+});
+
+/** A separate hub with custom options, for tests that need their own limits. */
+async function startTestHub(overrides: Partial<Parameters<typeof attachWsHub>[1]> = {}) {
+  const testServer = createServer();
+  const testHub = attachWsHub(testServer, {
+    path: '/ws',
+    allowedOrigins: [ORIGIN],
+    maxConnectionsPerIp: 10,
+    heartbeatMs: 60_000,
+    getSnapshot: () => store.snapshot(),
+    logger: silentLogger,
+    ...overrides,
+  });
+  await new Promise<void>((r) => testServer.listen(0, '127.0.0.1', r));
+  const { port } = testServer.address() as AddressInfo;
+  const stop = async () => {
+    await testHub.close();
+    await new Promise<void>((r) => testServer.close(() => r()));
+  };
+  return { hub: testHub, url: `ws://127.0.0.1:${port}/ws`, stop };
+}
+
+/** Open `n` connections at once and count how many were accepted vs rejected (by HTTP status). */
+async function openMany(url: string, n: number, headersFor: (i: number) => Record<string, string> = () => ({})) {
+  const sockets: WebSocket[] = [];
+  const results = await Promise.all(
+    Array.from(
+      { length: n },
+      (_, i) =>
+        new Promise<number>((resolve) => {
+          const ws = new WebSocket(url, { origin: ORIGIN, headers: headersFor(i) });
+          sockets.push(ws);
+          ws.once('open', () => resolve(101));
+          ws.once('unexpected-response', (_req, res) => resolve(res.statusCode ?? 0));
+          ws.once('error', () => resolve(-1));
+        }),
+    ),
+  );
+  for (const ws of sockets) ws.terminate();
+  return { accepted: results.filter((s) => s === 101).length, statuses: results };
+}
+
+describe('WebSocket hub behind a proxy (TRUST_PROXY)', () => {
+  it('limits per IP by the LAST X-Forwarded-For entry, so a spoofed first entry does not help', async () => {
+    const t = await startTestHub({ trustProxy: true, maxConnectionsPerIp: 10 });
+    try {
+      // Each client claims a different "first" IP, but the proxy-appended last entry is the same.
+      const { accepted, statuses } = await openMany(t.url, 12, (i) => ({
+        'X-Forwarded-For': `10.0.0.${i}, 203.0.113.7`,
+      }));
+      expect(accepted).toBe(10);
+      expect(statuses.filter((s) => s === 429)).toHaveLength(2);
+    } finally {
+      await t.stop();
+    }
+  });
+
+  it('falls back to the socket address when X-Forwarded-For is missing or empty', async () => {
+    const t = await startTestHub({ trustProxy: true, maxConnectionsPerIp: 2 });
+    try {
+      const { accepted } = await openMany(t.url, 3, (i): Record<string, string> => (i === 0 ? { 'X-Forwarded-For': ' , ' } : {}));
+      expect(accepted).toBe(2); // all three count as 127.0.0.1
+    } finally {
+      await t.stop();
+    }
+  });
+});
+
+describe('WebSocket hub total connection cap (MAX_CONNECTIONS)', () => {
+  it('rejects upgrades with 503 once the cap is reached, without crashing', async () => {
+    const t = await startTestHub({ maxConnections: 3, maxConnectionsPerIp: 100 });
+    try {
+      const { accepted, statuses } = await openMany(t.url, 5);
+      expect(accepted).toBe(3);
+      expect(statuses.filter((s) => s === 503)).toHaveLength(2);
+    } finally {
+      await t.stop();
+    }
+  });
+
+  it('accepts new connections again after others disconnect', async () => {
+    const t = await startTestHub({ maxConnections: 1, maxConnectionsPerIp: 100 });
+    try {
+      const first = connect(ORIGIN, t.url);
+      await first.next(1);
+      expect((await openMany(t.url, 1)).statuses).toEqual([503]);
+
+      first.ws.close();
+      await vi.waitFor(() => expect(t.hub.clientCount()).toBe(0));
+      expect((await openMany(t.url, 1)).accepted).toBe(1);
+    } finally {
+      await t.stop();
+    }
+  });
+});
+
+describe('WebSocket hub rejection logging', () => {
+  it('logs a flood of disallowed-origin upgrades only once per interval', async () => {
+    const lines: string[] = [];
+    const logger = { info: () => {}, warn: (m: string) => lines.push(m), error: () => {} };
+    const t = await startTestHub({ logger, rejectLogIntervalMs: 60_000 });
+    try {
+      const results = await Promise.all(
+        Array.from(
+          { length: 20 },
+          () =>
+            new Promise<number>((resolve) => {
+              const ws = new WebSocket(t.url, { origin: 'https://evil.example' });
+              ws.once('unexpected-response', (_req, res) => resolve(res.statusCode ?? 0));
+              ws.once('error', () => resolve(-1));
+            }),
+        ),
+      );
+      expect(results.every((s) => s === 403)).toBe(true);
+      expect(lines.filter((l) => l.includes('disallowed origin'))).toHaveLength(1);
+    } finally {
+      await t.stop();
     }
   });
 });

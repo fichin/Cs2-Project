@@ -100,6 +100,40 @@ describe('App (scoreboard over a WebSocket)', () => {
 
   const renderApp = () => render(<App url="ws://test/ws" createSocket={createFakeSocket} random={() => 1} />);
 
+  it('renders valid logo and stream links, and drops non-http(s) ones instead of rendering them', () => {
+    renderApp();
+    const good = makeMatch({
+      id: 'good',
+      streamUrl: 'https://kick.com/good',
+      teams: [
+        { id: 'g1', name: 'Good One', acronym: null, logoUrl: 'https://cdn.example.com/g1.png', score: 0 },
+        { id: 'g2', name: 'Good Two', acronym: null, logoUrl: null, score: 0 },
+      ],
+    });
+    const bad = {
+      ...makeMatch({ id: 'bad' }),
+      streamUrl: 'javascript:alert(1)',
+      teams: [
+        { id: 'b1', name: 'Bad One', acronym: null, logoUrl: 'javascript:alert(2)', score: 0 },
+        { id: 'b2', name: 'Bad Two', acronym: null, logoUrl: 'data:image/png;base64,AA', score: 0 },
+      ],
+    };
+    act(() => {
+      FakeWebSocket.latest().open();
+      FakeWebSocket.latest().receive(snapshot([good, bad as never]));
+    });
+
+    const goodCard = screen.getByRole('article', { name: /Good One/ });
+    expect(goodCard.querySelector('img')).toHaveAttribute('src', 'https://cdn.example.com/g1.png');
+    expect(within(goodCard).getByRole('link', { name: /Watch stream/ })).toHaveAttribute('href', 'https://kick.com/good');
+
+    const badCard = screen.getByRole('article', { name: /Bad One/ }); // the match itself is still shown
+    expect(badCard.querySelector('img')).toBeNull();
+    expect(within(badCard).getAllByTestId('logo-fallback')).toHaveLength(2);
+    expect(within(badCard).queryByRole('link')).toBeNull();
+    expect(document.body.innerHTML).not.toContain('javascript:');
+  });
+
   it('shows the DEMO DATA badge for fixture data and LIVE DATA for PandaScore', () => {
     renderApp();
     act(() => {

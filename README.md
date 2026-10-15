@@ -145,6 +145,7 @@ Server (`server/.env`, loaded with dotenv; see `server/.env.example`):
 | `POLL_INTERVAL_MS` | `30000` | Upstream poll interval. Values below 10,000 are raised to 10,000. |
 | `ALLOWED_ORIGIN` | `http://localhost:5173` | Comma-separated list of origins allowed to open the WebSocket |
 | `MAX_CONNECTIONS_PER_IP` | `10` | Concurrent WebSocket connections allowed per IP |
+| `MAX_CONNECTIONS` | `200` | Concurrent WebSocket connections allowed in total; extra connections get 503. Clamped to 1-10,000 with a logged warning. |
 | `TRUST_PROXY` | `false` | Set `true` behind a reverse proxy so the per-IP limit uses `X-Forwarded-For` |
 | `FORCE_SOURCE` | *(empty)* | `fixture` forces demo data even when a token is set |
 | `FIXTURE_INTERVAL_MS` | `5000` | Tick interval for demo data (local only, no API cost) |
@@ -221,3 +222,7 @@ The tests run with Vitest and never call the real API. They cover the message pr
 redaction, rate limiting and backoff, PandaScore mapping (against saved sample responses), source selection and
 config, the WebSocket hub (origin checks, connection limits, heartbeat), and on the client the reconnect logic,
 the dead-connection watchdog and the scoreboard components.
+
+## License
+
+License: MIT. See [LICENSE](LICENSE).

@@ -2,12 +2,15 @@ import type { IncomingMessage, Server } from 'node:http';
 import type { Duplex } from 'node:stream';
 import { PROTOCOL_VERSION, type ServerMessage, serializeServerMessage } from '@esports-live/shared';
 import { WebSocket, WebSocketServer } from 'ws';
+import { createThrottledWarn } from './logThrottle.js';
 import type { Logger } from './logger.js';
 
 export interface WsHubOptions {
   path: string;
   allowedOrigins: readonly string[];
   maxConnectionsPerIp: number;
+  /** Cap on concurrent connections across all clients; extra upgrades get 503. */
+  maxConnections?: number;
   /** Clients only ever need to answer pings; anything bigger is rejected by `ws` (close 1009). */
   maxPayloadBytes?: number;
   /** Protocol-level ping/pong used to terminate dead clients (invisible to browser JS). */
@@ -17,6 +20,8 @@ export interface WsHubOptions {
   /** Drop clients whose send buffer grows past this (they can't keep up). */
   maxBufferedBytes?: number;
   trustProxy?: boolean;
+  /** Rejected-upgrade warnings are logged at most once per this interval (per reason). */
+  rejectLogIntervalMs?: number;
   getSnapshot: () => ServerMessage;
   logger: Logger;
 }
@@ -32,11 +37,16 @@ interface TrackedSocket extends WebSocket {
   ip?: string;
 }
 
-function clientIp(req: IncomingMessage, trustProxy: boolean): string {
+export function clientIp(req: IncomingMessage, trustProxy: boolean): string {
   if (trustProxy) {
+    // Clients can send their own X-Forwarded-For; only the LAST entry is added by our proxy (Render).
     const fwd = req.headers['x-forwarded-for'];
-    const first = (Array.isArray(fwd) ? fwd[0] : fwd)?.split(',')[0]?.trim();
-    if (first) return first;
+    const entries = (Array.isArray(fwd) ? fwd.join(',') : (fwd ?? ''))
+      .split(',')
+      .map((e) => e.trim())
+      .filter(Boolean);
+    const last = entries.at(-1);
+    if (last) return last;
   }
   return req.socket.remoteAddress ?? 'unknown';
 }
@@ -54,10 +64,13 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
     heartbeatMs = 20_000,
     maxBufferedBytes = 1024 * 1024,
     trustProxy = false,
+    maxConnections = 200,
+    rejectLogIntervalMs = 60_000,
   } = opts;
   const wss = new WebSocketServer({ noServer: true, maxPayload: maxPayloadBytes, perMessageDeflate: false });
   const perIp = new Map<string, number>();
   const allowed = new Set(opts.allowedOrigins);
+  const warnRejected = createThrottledWarn(logger, rejectLogIntervalMs);
 
   const send = (ws: WebSocket, frame: string) => {
     if (ws.readyState !== WebSocket.OPEN) return;
@@ -78,14 +91,19 @@ export function attachWsHub(server: Server, opts: WsHubOptions): WsHub {
 
     const origin = req.headers.origin;
     if (!origin || !allowed.has(origin)) {
-      logger.warn(`Rejected WebSocket upgrade from disallowed origin: ${origin ?? '(none)'}`);
+      warnRejected('origin', `Rejected WebSocket upgrade from disallowed origin: ${origin ?? '(none)'}`);
       return reject(socket, 403, 'Forbidden');
+    }
+
+    if (wss.clients.size >= maxConnections) {
+      warnRejected('capacity', `Rejected WebSocket upgrade: server is at its connection limit (${maxConnections})`);
+      return reject(socket, 503, 'Service Unavailable');
     }
 
     const ip = clientIp(req, trustProxy);
     const count = perIp.get(ip) ?? 0;
     if (count >= opts.maxConnectionsPerIp) {
-      logger.warn(`Rejected WebSocket upgrade: too many connections from one IP (${count})`);
+      warnRejected('per-ip', `Rejected WebSocket upgrade: too many connections from one IP (${count})`);
       return reject(socket, 429, 'Too Many Requests');
     }
 
