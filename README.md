@@ -1,5 +1,7 @@
 # esports-live
 
+[![CI](https://github.com/fichin/Cs2-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/fichin/Cs2-Project/actions/workflows/ci.yml)
+
 esports-live is a real-time dashboard that shows live CS2 matches, schedules and results. A Node.js WebSocket
 server pulls data from the PandaScore API and pushes updates to a React client, which detects dead connections
 with a heartbeat and reconnects automatically. I built it to learn real-time systems, testing and deployment,
@@ -195,17 +197,6 @@ about 30 s after it happens.
 schedule driven by the clock. They are always tagged `source: "fixture"` and shown with a **DEMO DATA**
 badge. They are not real matches.
 
-## Security notes
-
-- The PandaScore token lives only in `server/.env`, which is git-ignored. It is never sent to the browser,
-  logged, or included in tests or fixtures.
-- Every log line passes through a redactor that masks the known token, plus any `token=` query parameter or
-  `Bearer` credential.
-- WebSocket hardening: Origin allow-list, 1 KB maximum inbound payload (clients don't need to send
-  anything), per-IP connection cap, heartbeat that terminates dead peers, and disconnection of clients that
-  fall too far behind (backpressure).
-- Logo and stream URLs from the API are only passed to the browser if they are `http(s)` URLs.
-
 ## Accessibility
 
 Semantic landmarks and headings, a skip link, visible focus styles, colour tokens checked against WCAG
@@ -222,6 +213,27 @@ The tests run with Vitest and never call the real API. They cover the message pr
 redaction, rate limiting and backoff, PandaScore mapping (against saved sample responses), source selection and
 config, the WebSocket hub (origin checks, connection limits, heartbeat), and on the client the reconnect logic,
 the dead-connection watchdog and the scoreboard components.
+
+## Security
+
+- **Allowed origins only.** The server accepts a WebSocket connection only if its `Origin` header is in
+  `ALLOWED_ORIGIN`; anything else is rejected with 403.
+- **Connection limits.** At most `MAX_CONNECTIONS_PER_IP` connections per IP (429) and `MAX_CONNECTIONS` in
+  total (503). Behind Render's proxy (`TRUST_PROXY=true`) the IP is the **last** `X-Forwarded-For` entry, the
+  one the proxy adds, so a client can't get around the limit by sending its own header. I checked this on the
+  live server with spoofed headers.
+- **Incoming data is not trusted.** Clients have nothing to send: their messages are ignored and anything over
+  1 KB closes the connection. The client validates every server message against the shared schema and drops
+  invalid ones. Dead and too-slow clients are disconnected.
+- **Safe links only.** Logo and stream URLs from the API reach the browser only if they are `http(s)` URLs;
+  anything else becomes `null`.
+- **Minimal health check.** `/health` returns only `{"status":"ok"}`, with no version, uptime or config.
+- **Rate-limited logs.** Rejected connections are logged at most once per minute per reason, with a count of
+  the ones skipped, so a flood of bad requests can't fill the logs.
+- **Token stays on the server.** The PandaScore token lives only in the server environment (`server/.env`,
+  git-ignored, or the Render dashboard). It is never in the repo or the client bundle, and the logger masks it.
+- **CI and protected main.** Lint, typecheck, tests and build run on every push and pull request. `main`
+  can only change through a pull request with passing CI, and force pushes and deletion are blocked.
 
 ## License
 
